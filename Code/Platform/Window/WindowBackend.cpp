@@ -1,4 +1,4 @@
-#include "Platform/window/WindowBackend.h"
+#include "Platform/Window/WindowBackend.h"
 
 #include <GLFW/glfw3.h>
 #include <print>

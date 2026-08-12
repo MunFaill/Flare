@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Platform/window/Window.h"
+#include "Platform/Window/Window.h"
 
 #define ENTRY_POINT(App)          \
 int main(int argc, char **argv) { \

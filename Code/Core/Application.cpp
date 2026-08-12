@@ -1,5 +1,5 @@
 #include "Core/Application.h"
-#include "Platform/window/WindowBackend.h"
+#include "Platform/Window/WindowBackend.h"
 
 static Window InternDefaultWindow = {};
 
