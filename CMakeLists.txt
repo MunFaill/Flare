@@ -18,6 +18,10 @@ set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(Vendor/glfw)
 
+# GLM
+
+add_subdirectory(Vendor/glm)
+
 # Flare
 
 file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS
@@ -30,6 +34,7 @@ add_library(Flare SHARED ${LIB_SOURCES})
 target_include_directories(Flare PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Code")
 
 target_link_libraries(Flare PUBLIC glfw)
+target_link_libraries(Flare PUBLIC glm::glm)
 
 #Sandbox
 
