@@ -10,5 +10,5 @@ class Shader {
         virtual void Unbind() = 0;
         virtual void SendData(const char* VertexShaderSource, const char* FragmentShaderSource) = 0;
 
-        std::unique_ptr<Shader> Create();
+        static std::unique_ptr<Shader> Create();
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Engine.h"
+#include <string>
 
 class Application {
     public:
@@ -15,4 +16,6 @@ class Application {
     protected:
         EngineContext Context;
         bool Running = true;
+        std::string WindowTilte = "";
+        uint32_t WindowWidth = 0, WIndowHeight = 0;
 };

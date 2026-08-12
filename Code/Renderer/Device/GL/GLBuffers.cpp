@@ -1,5 +1,6 @@
 #include "Renderer/Device/GL/GLBuffers.h"
 
+#include <cstdint>
 #include <glad/gl.h>
 
 /* ===================================+
@@ -51,7 +52,7 @@ void GLIndexBuffer::Unbind() {
 
 void GLIndexBuffer::SendData(uint32_t* Data, uint32_t Count) {
     this->Bind();
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, Count, Data, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, Count * sizeof(uint32_t), Data, GL_STATIC_DRAW);
     m_Count = Count;
     this->Unbind();
 }

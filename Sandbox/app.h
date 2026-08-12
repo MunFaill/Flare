@@ -4,8 +4,8 @@
 
 class App : public Application {
     public:
-        App() = default;
-        ~App() override = default;
+        App();
+        ~App() override;
 
         void OnStart() override;
         void OnUpdate() override;

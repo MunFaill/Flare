@@ -15,5 +15,5 @@ class Mesh {
         virtual void SendData(std::unique_ptr<VertexBuffer> Vertices, std::unique_ptr<IndexBuffer> Indices) = 0;
         virtual uint32_t GetIndexCount() = 0;
 
-        std::unique_ptr<Mesh> Create();
+        static std::unique_ptr<Mesh> Create();
 };

@@ -1,7 +1,6 @@
 #include "Renderer/Device/GL/GLMesh.h"
 #include "Renderer/Device/DeviceBuffers.h"
 
-#include <GLES2/gl2.h>
 #include <cstddef>
 #include <glad/gl.h>
 
@@ -45,6 +44,7 @@ void GLMesh::SendData(std::unique_ptr<VertexBuffer> Vertices, std::unique_ptr<In
     IndexCount = Indices->GetCount();
 
     this->Unbind();
+    
     Vertices->Unbind();
     Indices->Unbind();
 }

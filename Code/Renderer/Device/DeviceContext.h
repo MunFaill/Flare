@@ -23,5 +23,5 @@ class DeviceContext {
         bool IsOpenGL();
         bool IsVulkan();
 
-        std::unique_ptr<DeviceContext> Create();
+        static std::unique_ptr<DeviceContext> Create();
 };

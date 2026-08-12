@@ -8,9 +8,13 @@ void Application::Run() {
 
     Context.DefaultWindow = &InternDefaultWindow;
 
-    OnStart();
+    if (WindowTilte != "") Context.DefaultWindow->Title = WindowTilte;
+    if (WindowWidth != 0) Context.DefaultWindow->Width = WindowWidth;
+    if (WIndowHeight != 0) Context.DefaultWindow->Height = WIndowHeight;
 
     Context.DefaultWindow->Init();
+
+    OnStart();
 
     while(Running) {
 

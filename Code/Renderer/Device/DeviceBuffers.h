@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <glm/glm.hpp>
 #include <memory>
+#include <sys/stat.h>
 
 struct Vertex {
     glm::vec3 Position;
@@ -20,7 +21,7 @@ class VertexBuffer {
         virtual void SendData(void* Data, uint32_t Size) = 0;
         virtual uint32_t GetSize() = 0;
 
-        std::unique_ptr<VertexBuffer> Create();
+        static std::unique_ptr<VertexBuffer> Create();
 };
 
 class IndexBuffer {
@@ -32,5 +33,5 @@ class IndexBuffer {
         virtual void SendData(uint32_t* Data, uint32_t Count) = 0;
         virtual uint32_t GetCount() = 0;
 
-        std::unique_ptr<IndexBuffer> Create();
+        static std::unique_ptr<IndexBuffer> Create();
 };

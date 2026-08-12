@@ -10,7 +10,8 @@ GLShader::GLShader() {
 }
 
 GLShader::~GLShader() {
-	glDeleteProgram(SP);
+	if (SP != 0)
+		glDeleteProgram(SP);
 }
 
 void GLShader::Bind() {

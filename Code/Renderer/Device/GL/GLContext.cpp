@@ -6,6 +6,10 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
+}  
+
 void GLContext::Initialize(Window& window) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -20,6 +24,8 @@ void GLContext::Initialize(Window& window) {
         std::println("Error to load GLAD");
         window.Shutdown();
     }
+
+    glfwSetFramebufferSizeCallback(window.Handle, framebuffer_size_callback);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
