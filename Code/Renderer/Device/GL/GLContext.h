@@ -12,4 +12,5 @@ class GLContext : public DeviceContext {
         void DepthTest(bool State) override;
         void CullFaces(bool State) override;
         void Blend(bool State) override;
+        void Clear(glm::vec4 Color) override;
 };

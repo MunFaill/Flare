@@ -48,3 +48,8 @@ void GLContext::Blend(bool State) {
     if (State) glEnable(GL_BLEND);
     else glDisable(GL_BLEND);
 }
+
+void GLContext::Clear(glm::vec4 Color) {
+    glClearColor(Color.x, Color.y, Color.z, Color.w);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}

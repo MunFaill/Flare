@@ -23,6 +23,14 @@ class ComponentStorage {
         inline void Remove(Entity entity) {
             m_Components.erase(entity);
         }
+
+        inline auto begin() {
+            return m_Components.begin();
+        }
+
+        inline auto end() {
+            return m_Components.end();
+        }
     private:
         std::unordered_map<Entity, T> m_Components;
 };

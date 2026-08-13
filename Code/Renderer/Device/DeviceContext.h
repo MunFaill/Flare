@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glm/glm.hpp>
 #include <cstdint>
 #include <memory>
 
@@ -18,6 +19,7 @@ class DeviceContext {
         virtual void DepthTest(bool State) = 0;
         virtual void CullFaces(bool State) = 0;
         virtual void Blend(bool State) = 0;
+        virtual void Clear(glm::vec4 Color) = 0;
 
         bool IsNone();
         bool IsOpenGL();
