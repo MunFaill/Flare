@@ -1,43 +1,48 @@
 #include "Core/Application.h"
 #include "Platform/Window/WindowBackend.h"
-#include "Renderer/System/RendererSystem.h"
 #include "Scene/Scene.h"
+#include <print>
 
 static Window InternDefaultWindow = {};
 static Scene InternDefaultScene = {};
-static RendererSystem InternRendererSystem = {};
+static RendererSystem InternDefaultRendererSystem = {};
 
 void Application::Run() {
     WindowBackend::Init();
 
-    Context.DefaultWindow = &InternDefaultWindow;
-    Context.DefaultScene = &InternDefaultScene;
+    if (!Context.DefaultWindow) Context.DefaultWindow = &InternDefaultWindow;
+    if (!Context.DefaultScene) Context.DefaultScene = &InternDefaultScene;
+    if (!Context.DefaultRenderer) Context.DefaultRenderer = &InternDefaultRendererSystem;
 
     if (WindowTilte != "") Context.DefaultWindow->Title = WindowTilte;
     if (WindowWidth != 0) Context.DefaultWindow->Width = WindowWidth;
     if (WIndowHeight != 0) Context.DefaultWindow->Height = WIndowHeight;
 
     Context.DefaultWindow->Init();
+    Context.DefaultRenderer->Init(*Context.DefaultWindow);
 
-    InternRendererSystem.Init(*Context.DefaultWindow);
+    std::println("Application initialized");
 
     OnStart();
+    
 
+    std::println("Application loop");
     while(Running) {
 
-        if (Context.DefaultWindow->CloseEvent()) Running = false;
+        if (Context.DefaultWindow && Context.DefaultWindow->CloseEvent()) Running = false;
 
-        if (Context.DefaultScene) InternRendererSystem.Update(*Context.DefaultScene);
+        if (Context.DefaultScene) Context.DefaultRenderer->Update(*Context.DefaultScene);
 
         OnUpdate();
 
-        Context.DefaultWindow->Update(); // Swap buffers
+        if (Context.DefaultWindow) Context.DefaultWindow->Update(); // Swap buffers
     }
 
     OnStop();
+    std::println("Application shutdown");
 
-    InternRendererSystem.Shutdown();
-    Context.DefaultWindow->Shutdown();
+    if (Context.DefaultRenderer) Context.DefaultRenderer->Shutdown();
+    if (Context.DefaultWindow) Context.DefaultWindow->Shutdown();
     
     WindowBackend::Shutdown();
 }

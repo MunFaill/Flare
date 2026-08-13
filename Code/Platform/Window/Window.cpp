@@ -19,6 +19,7 @@ void Window::Update() {
 
 void Window::Shutdown() {
     glfwDestroyWindow(Handle);
+    std::println("Window shutdown");
 }
 
 bool Window::CloseEvent() {

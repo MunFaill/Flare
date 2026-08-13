@@ -1,7 +1,5 @@
 #pragma once
 
-#define GLM_ENABLE_EXPERIMENTAL
-#include "glm/ext.hpp"
 #include <string>
 #include <glm/glm.hpp>
 
@@ -19,10 +17,7 @@ struct TransformComponent {
     glm::vec3 Rotation{0.0f, 0.0f, 0.0f};
     glm::vec3 Scale{1.0f, 1.0f, 1.0f};
 
-    inline glm::mat4 GetTransform() const {
-        glm::mat4 rotation = glm::yawPitchRoll(glm::radians(Rotation.y), glm::radians(Rotation.x), glm::radians(Rotation.z));
-        return glm::translate(glm::mat4(1.0f), Position) * rotation * glm::scale(glm::mat4(1.0f), Scale);
-    }
+    glm::mat4 GetTransform() const;
 };
 
 struct MeshComponent {

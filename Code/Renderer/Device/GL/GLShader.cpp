@@ -8,11 +8,17 @@ GLShader::GLShader() {
 	VS = glCreateShader(GL_VERTEX_SHADER);
 	FS = glCreateShader(GL_FRAGMENT_SHADER);
 	SP = glCreateProgram();
+	std::println("Vertex shader: {}, Fragment shader: {} and Shader program: {} created", VS, FS, SP);
 }
 
 GLShader::~GLShader() {
-	if (SP != 0)
-		glDeleteProgram(SP);
+	std::println("Shader program deleted: {}", SP);
+	glDeleteProgram(SP);
+	if (VS && FS) {
+		std::println("Vertex shader deleted: {} | Fragment shader deleted: {}", VS, FS);
+		glDeleteShader(VS);
+		glDeleteShader(FS);
+	}
 }
 
 void GLShader::Bind() {

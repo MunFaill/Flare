@@ -17,6 +17,7 @@ void GLContext::Initialize(Window& window) {
     #if defined (__APPLE__)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
     #endif
+    std::println("GL context configured");
 
     glfwMakeContextCurrent(window.Handle);
 
@@ -28,6 +29,7 @@ void GLContext::Initialize(Window& window) {
     glfwSetFramebufferSizeCallback(window.Handle, framebuffer_size_callback);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    std::println("GL context initialized");
 }
 
 void GLContext::DrawCall(uint32_t IndexCount) {

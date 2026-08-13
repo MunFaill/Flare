@@ -149,7 +149,6 @@ void AssetProcessor(const std::vector<std::string>& Files) {
 
                 Assets::Meshes.Add(GetAssetName(FilePath), std::move(mesh));
             }
-
             cgltf_free(data);
         }
         std::println("{}: Parsed", FilePath);

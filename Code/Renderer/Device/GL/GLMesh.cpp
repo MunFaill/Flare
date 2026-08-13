@@ -3,12 +3,15 @@
 
 #include <cstddef>
 #include <glad/gl.h>
+#include <print>
 
 GLMesh::GLMesh() {
     glGenVertexArrays(1, &VAO);
+    std::println("Vertex array created: {}", VAO);
 }
 
 GLMesh::~GLMesh() {
+    std::println("Vertex array deleted: {}", VAO);
     glDeleteVertexArrays(1, &VAO);
 }
 
@@ -42,6 +45,8 @@ void GLMesh::SendData(std::unique_ptr<VertexBuffer> Vertices, std::unique_ptr<In
     glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Color));
 
     IndexCount = Indices->GetCount();
+
+    std::println("Data send to vertex arrat: {}", VAO);
 
     this->Unbind();
     

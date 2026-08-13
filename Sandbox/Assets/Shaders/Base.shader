@@ -33,7 +33,7 @@ in vec3 vNormal;
 in vec2 vTexCoord;
 in vec4 vColor;
 
-void main() {
+vec3 light() {
     vec3 lightPos = vec3(5.0, 5.0, 5.0);
     vec3 lightColor = vec3(1.0);
 
@@ -47,5 +47,9 @@ void main() {
     vec3 ambient = ambientStrenght * lightColor;
 
     vec3 result = (ambient + diffuse) * vColor.xyz;
-    FragmentColor = vec4(result, vColor.a);
+    return result;
+}
+
+void main() {
+    FragmentColor = vec4(light(), vColor.a);
 }

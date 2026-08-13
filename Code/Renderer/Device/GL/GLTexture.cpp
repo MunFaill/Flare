@@ -1,12 +1,15 @@
 #include "Renderer/Device/GL/GLTexture.h"
 
 #include <glad/gl.h>
+#include <print>
 
 GLTexture::GLTexture() {
     glGenTextures(1, &TextureObject);
+    std::println("Texture object created: {}", TextureObject);
 }
 
 GLTexture::~GLTexture() {
+    std::println("Texture object deleted: {}", TextureObject);
     glDeleteTextures(1, &TextureObject);
 }
 
@@ -26,6 +29,7 @@ void GLTexture::SendData(unsigned char* data, uint32_t Width, uint32_t Height) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    std::println("Data send to texture object: {}", TextureObject);
     this->Unbind();
 }
 
