@@ -17,8 +17,8 @@ out vec4 vColor;
 void main() {
     gl_Position = u_ViewProjection * u_Model * vec4(aPosition, 1.0);
 
-    vPosition = aPosition;
-    vNormal = aNormal;
+    vPosition = vec3(u_Model * vec4(aPosition, 1.0));
+    vNormal = mat3(transpose(inverse(u_Model))) * aNormal;
     vTexCoord = aTexCoord;
     vColor = aColor;
 }
@@ -34,5 +34,18 @@ in vec2 vTexCoord;
 in vec4 vColor;
 
 void main() {
-    FragmentColor = vColor;
+    vec3 lightPos = vec3(5.0, 5.0, 5.0);
+    vec3 lightColor = vec3(1.0);
+
+    vec3 norm = normalize(vNormal);
+    vec3 lightDir = normalize(lightPos - vPosition);
+
+    float diff = max(dot(norm, lightDir), 0.0);
+    vec3 diffuse = diff * lightColor;
+
+    float ambientStrenght = 0.1;
+    vec3 ambient = ambientStrenght * lightColor;
+
+    vec3 result = (ambient + diffuse) * vColor.xyz;
+    FragmentColor = vec4(result, vColor.a);
 }
