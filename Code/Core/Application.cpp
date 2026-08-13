@@ -31,7 +31,7 @@ void Application::Run() {
 
         OnUpdate();
 
-        Context.DefaultWindow->Update();
+        Context.DefaultWindow->Update(); // Swap buffers
     }
 
     OnStop();

@@ -46,5 +46,4 @@ void GLMesh::SendData(std::unique_ptr<VertexBuffer> Vertices, std::unique_ptr<In
     this->Unbind();
     
     Vertices->Unbind();
-    Indices->Unbind();
 }

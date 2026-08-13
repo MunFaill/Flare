@@ -4,6 +4,8 @@
 #include "Scene/Entity/Components.h"
 #include "Scene/Entity/Entity.h"
 
+#include <tuple>
+
 class Scene {
     public:
         inline Entity CreateEntity() {
@@ -16,23 +18,32 @@ class Scene {
         }
 
         template<typename T>
-        T* GetComponent(Entity entity)
-        {
+        inline bool HasComponent(Entity entity) {
+            return GetStorage<T>().Get(entity) != nullptr; 
+        }
+
+        template<typename T>
+        inline T* GetComponent(Entity entity) {
             return GetStorage<T>().Get(entity);
         }
 
         template<typename T>
-        void RemoveComponent(Entity entity)
-        {
+        inline void RemoveComponent(Entity entity) {
             GetStorage<T>().Remove(entity);
         }
 
-        template<typename T, typename Func>
-        void Each(Func&& function) {
+        template<typename T, typename... OtherTypes, typename Func>
+        inline void Each(Func&& function) {
             ComponentStorage<T>& storage = GetStorage<T>();
-
+        
             for (auto& [entity, component] : storage) {
-                function(entity, component);
+                if ((this->template HasComponent<OtherTypes>(entity) && ...)) {
+                    function(
+                        entity, 
+                        component, 
+                        *this->template GetComponent<OtherTypes>(entity)... 
+                    );
+                }
             }
         }
 
@@ -47,6 +58,7 @@ class Scene {
         std::tuple<
             ComponentStorage<TagComponent>,
             ComponentStorage<TransformComponent>,
-            ComponentStorage<MeshComponent>
+            ComponentStorage<MeshComponent>,
+            ComponentStorage<CameraComponent>
         > m_Components;
 };

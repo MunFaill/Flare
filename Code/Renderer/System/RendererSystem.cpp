@@ -3,33 +3,57 @@
 #include "Platform/Window/Window.h"
 #include "Scene/Entity/Components.h"
 #include "Scene/Scene.h"
+#include "glm/ext/matrix_clip_space.hpp"
+#include "glm/trigonometric.hpp"
 
 #include <Renderer/Device/Device.h>
+
+static Window internWindow;
 
 void RendererSystem::Init(Window& window) {
     m_Context = DeviceContext::Create();
     m_Context->Initialize(window);
-    m_Context->CullFaces(false); // Change this later!!
-    m_Context->DepthTest(false);
+    m_Context->CullFaces(true);
+    m_Context->DepthTest(true);
     m_Context->Blend(true);
+    internWindow = window;
 }
 
 void RendererSystem::Update(Scene& scene) {
     m_Context->Clear({0.0f, 0.0f, 0.0f, 1.0f});
+
+    glm::mat4 viewMatrix = glm::mat4(1.0f);
+    glm::mat4 projectionMatrix = glm::mat4(1.0f);
+    bool foundCamera = false;
+
+    scene.Each<TransformComponent, CameraComponent>(
+        [&](Entity entity, TransformComponent& transform, CameraComponent& camera) {
+            if (!camera.Current) return;
+
+            viewMatrix = glm::inverse(transform.GetTransform());
+            float aspectRatio = (float)internWindow.Width / (float)internWindow.Height;
+            projectionMatrix = glm::perspective(glm::radians(camera.Fov), aspectRatio, camera.Near, camera.Far);
+        }
+    );
+
+    glm::mat4 viewProjection = projectionMatrix * viewMatrix;
+
     Assets::Shaders.Get("Base")->Bind();
-    scene.Each<MeshComponent>(
-        [this](Entity entity, MeshComponent& mesh)
+
+    Assets::Shaders.Get("Base")->SetMat4("u_ViewProjection", viewProjection);
+
+    scene.Each<MeshComponent, TransformComponent>(
+        [this](Entity entity, MeshComponent& mesh, TransformComponent& transform)
         {
             Mesh* model = Assets::Meshes.Get(mesh.MeshID);
 
             if (!model)
                 return;
 
-            model->Bind();
+            Assets::Shaders.Get("Base")->SetMat4("u_Model", transform.GetTransform());
 
-            m_Context->DrawCall(
-                model->GetIndexCount()
-            );
+            model->Bind();
+            m_Context->DrawCall(model->GetIndexCount());
         }
     );
 }

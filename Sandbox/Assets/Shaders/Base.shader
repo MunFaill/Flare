@@ -6,13 +6,16 @@ layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoord;
 layout (location = 3) in vec4 aColor;
 
+uniform mat4 u_Model;
+uniform mat4 u_ViewProjection;
+
 out vec3 vPosition;
 out vec3 vNormal;
 out vec2 vTexCoord;
 out vec4 vColor;
 
 void main() {
-    gl_Position = vec4(aPosition, 1.0);
+    gl_Position = u_ViewProjection * u_Model * vec4(aPosition, 1.0);
 
     vPosition = aPosition;
     vNormal = aNormal;

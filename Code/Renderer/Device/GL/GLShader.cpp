@@ -1,4 +1,5 @@
 #include "Renderer/Device/GL/GLShader.h"
+#include "glm/gtc/type_ptr.hpp"
 
 #include <glad/gl.h>
 #include <print>
@@ -53,3 +54,28 @@ void GLShader::SendData(const char* VertexShaderSource, const char* FragmentShad
 	glDeleteShader(VS);
 	glDeleteShader(FS);
 }
+
+void GLShader::SetInt(const std::string& name, const int& value) {
+	glUniform1i(glGetUniformLocation(SP, name.c_str()), value);
+}
+
+void GLShader::SetFloat(const std::string& name, const float& value) {
+	glUniform1f(glGetUniformLocation(SP, name.c_str()), value);
+}
+
+void GLShader::SetVec2(const std::string& name, const glm::vec2& value) {
+	glUniform2fv(glGetUniformLocation(SP, name.c_str()), 1, glm::value_ptr(value));
+}
+
+void GLShader::SetVec3(const std::string& name, const glm::vec3& value) {
+	glUniform3fv(glGetUniformLocation(SP, name.c_str()), 1, glm::value_ptr(value));
+}
+
+void GLShader::SetVec4(const std::string& name, const glm::vec4& value) {
+	glUniform4fv(glGetUniformLocation(SP, name.c_str()), 1, glm::value_ptr(value));
+}
+
+void GLShader::SetMat4(const std::string& name, const glm::mat4& value) {
+	glUniformMatrix4fv(glGetUniformLocation(SP, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
+}
+
