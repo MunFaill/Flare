@@ -38,26 +38,31 @@ struct Material {
     vec4 Albedo;
 };
 
-uniform Material mat;
+struct Light {
+    vec3 LightPos;
+    vec3 LightColor;
+};
 
-vec3 light() {
-    vec3 lightPos = vec3(5.0, 5.0, 5.0);
-    vec3 lightColor = vec3(1.0);
+#define MAX_LIGHTS 8
 
+uniform Material material;
+uniform Light light;
+
+vec3 lightFunc() {
     vec3 norm = normalize(vNormal);
-    vec3 lightDir = normalize(lightPos - vPosition);
+    vec3 lightDir = normalize(light.LightPos - vPosition);
 
     float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = diff * lightColor;
+    vec3 diffuse = diff * light.LightColor;
 
     float ambientStrenght = 0.1;
-    vec3 ambient = ambientStrenght * lightColor;
+    vec3 ambient = ambientStrenght * vec3(1.0); // Ambient color
 
-    vec3 result = (ambient + diffuse) * mat.Albedo.xyz;
+    vec3 result = (ambient + diffuse) * material.Albedo.xyz;
     return result;
 }
 
 void main() {
-    vec4 texColor = texture(mat.Texture, vTexCoord);
-    FragmentColor = vec4(light() * texColor.rgb, mat.Albedo.a * texColor.a);
+    vec4 texColor = texture(material.Texture, vTexCoord);
+    FragmentColor = vec4(lightFunc() * texColor.rgb, material.Albedo.a * texColor.a);
 }

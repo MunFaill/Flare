@@ -28,3 +28,7 @@ struct MaterialComponent {
     std::string TextureID = "Default";
     glm::vec4 Albedo = {1.0f, 1.0f, 1.0f, 1.0f};
 };
+
+struct LightComponent {
+    glm::vec3 LightColor = {1.0f, 1.0f, 1.0f};
+};

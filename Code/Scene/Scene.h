@@ -60,6 +60,7 @@ class Scene {
             ComponentStorage<TransformComponent>,
             ComponentStorage<MeshComponent>,
             ComponentStorage<CameraComponent>,
-            ComponentStorage<MaterialComponent>
+            ComponentStorage<MaterialComponent>,
+            ComponentStorage<LightComponent>
         > m_Components;
 };

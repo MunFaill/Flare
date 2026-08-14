@@ -42,6 +42,13 @@ void RendererSystem::Update(Scene& scene) {
 
     Assets::Shaders.Get("Base")->SetMat4("u_ViewProjection", viewProjection);
 
+    scene.Each<LightComponent, TransformComponent>(
+        [this](Entity entity, LightComponent& light, TransformComponent& transform) {
+            Assets::Shaders.Get("Base")->SetVec3("light.LightPos", transform.Position);
+            Assets::Shaders.Get("Base")->SetVec3("light.LightColor", light.LightColor);
+        }
+    );
+
     scene.Each<MeshComponent, TransformComponent>(
         [this, &scene](Entity entity, MeshComponent& mesh, TransformComponent& transform)
         {
@@ -53,10 +60,10 @@ void RendererSystem::Update(Scene& scene) {
             if (scene.HasComponent<MaterialComponent>(entity)) {
                 MaterialComponent* mat = scene.GetComponent<MaterialComponent>(entity);
                 Assets::Textures.Get(mat->TextureID)->Bind(0);
-                Assets::Shaders.Get("Base")->SetVec4("mat.Albedo", mat->Albedo);
+                Assets::Shaders.Get("Base")->SetVec4("material.Albedo", mat->Albedo);
             } else {
                 Assets::Textures.Get("Default")->Bind(0);
-                Assets::Shaders.Get("Base")->SetVec4("mat.Albedo", glm::vec4(1.0f));
+                Assets::Shaders.Get("Base")->SetVec4("material.Albedo", glm::vec4(1.0f));
             }
 
             Assets::Shaders.Get("Base")->SetMat4("u_Model", transform.GetTransform());

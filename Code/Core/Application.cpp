@@ -6,6 +6,7 @@
 static Window InternDefaultWindow = {};
 static Scene InternDefaultScene = {};
 static RendererSystem InternDefaultRendererSystem = {};
+static Time InternTime = {};
 
 void Application::Run() {
     WindowBackend::Init();
@@ -13,6 +14,7 @@ void Application::Run() {
     if (!Context.DefaultWindow) Context.DefaultWindow = &InternDefaultWindow;
     if (!Context.DefaultScene) Context.DefaultScene = &InternDefaultScene;
     if (!Context.DefaultRenderer) Context.DefaultRenderer = &InternDefaultRendererSystem;
+    if (!Context.Delta) Context.Delta = &InternTime;
 
     if (WindowTilte != "") Context.DefaultWindow->Title = WindowTilte;
     if (WindowWidth != 0) Context.DefaultWindow->Width = WindowWidth;
@@ -20,6 +22,7 @@ void Application::Run() {
 
     Context.DefaultWindow->Init();
     Context.DefaultRenderer->Init(*Context.DefaultWindow);
+    Context.Delta->InitTime();
 
     std::println("Application initialized");
 
@@ -28,8 +31,8 @@ void Application::Run() {
     std::println("Application loop");
     while(Running) {
 
+        if (Context.Delta) Context.Delta->CalculateTime();
         if (Context.DefaultWindow && Context.DefaultWindow->CloseEvent()) Running = false;
-
         if (Context.DefaultScene) Context.DefaultRenderer->Update(*Context.DefaultScene);
 
         OnUpdate();
