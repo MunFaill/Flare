@@ -25,7 +25,6 @@ void Application::Run() {
 
     OnStart();
     
-
     std::println("Application loop");
     while(Running) {
 

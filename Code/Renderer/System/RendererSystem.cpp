@@ -43,12 +43,21 @@ void RendererSystem::Update(Scene& scene) {
     Assets::Shaders.Get("Base")->SetMat4("u_ViewProjection", viewProjection);
 
     scene.Each<MeshComponent, TransformComponent>(
-        [this](Entity entity, MeshComponent& mesh, TransformComponent& transform)
+        [this, &scene](Entity entity, MeshComponent& mesh, TransformComponent& transform)
         {
             Mesh* model = Assets::Meshes.Get(mesh.MeshID);
 
             if (!model)
                 return;
+
+            if (scene.HasComponent<MaterialComponent>(entity)) {
+                MaterialComponent* mat = scene.GetComponent<MaterialComponent>(entity);
+                Assets::Textures.Get(mat->TextureID)->Bind(0);
+                Assets::Shaders.Get("Base")->SetVec4("mat.Albedo", mat->Albedo);
+            } else {
+                Assets::Textures.Get("Default")->Bind(0);
+                Assets::Shaders.Get("Base")->SetVec4("mat.Albedo", glm::vec4(1.0f));
+            }
 
             Assets::Shaders.Get("Base")->SetMat4("u_Model", transform.GetTransform());
 

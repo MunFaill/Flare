@@ -59,6 +59,7 @@ class Scene {
             ComponentStorage<TagComponent>,
             ComponentStorage<TransformComponent>,
             ComponentStorage<MeshComponent>,
-            ComponentStorage<CameraComponent>
+            ComponentStorage<CameraComponent>,
+            ComponentStorage<MaterialComponent>
         > m_Components;
 };

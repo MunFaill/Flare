@@ -12,6 +12,8 @@
 
 #define CGLTF_IMPLEMENTATION
 #include <cgltf.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 // Helpers
 enum class ShaderType {
@@ -117,8 +119,14 @@ void AssetProcessor(const std::vector<std::string>& Files) {
                                 cgltf_accessor_read_float(accessor, i, &vertices[baseIndex + i].TexCoord.x, 2);
                             }
                         } else if (attr.type == cgltf_attribute_type_color) {
+                            cgltf_size numComponents = cgltf_num_components(accessor->type);
                             for (cgltf_size i = 0; i < numVertices; ++i) {
-                                cgltf_accessor_read_float(accessor, i, &vertices[baseIndex + i].Color.r, 4);
+                                if (numComponents == 3) {
+                                    vertices[baseIndex + i].Color.a = 1.0f;
+                                    cgltf_accessor_read_float(accessor, i, &vertices[baseIndex + i].Color.r, 3);
+                                } else if (numComponents == 4) {
+                                    cgltf_accessor_read_float(accessor, i, &vertices[baseIndex + i].Color.r, 4);
+                                }
                             }
                         }
                     }
@@ -126,6 +134,7 @@ void AssetProcessor(const std::vector<std::string>& Files) {
                     if (primitive.indices) {
                         const cgltf_accessor* indexAccessor = primitive.indices;
                         cgltf_size indexCount = indexAccessor->count;
+                        indices.reserve(indices.size() + indexCount);
 
                         for (cgltf_size i = 0; i < indexCount; ++i) {
                             uint32_t index = static_cast<uint32_t>(cgltf_accessor_read_index(indexAccessor, i));
@@ -150,8 +159,20 @@ void AssetProcessor(const std::vector<std::string>& Files) {
                 Assets::Meshes.Add(GetAssetName(FilePath), std::move(mesh));
             }
             cgltf_free(data);
+            std::println("{}: Parsed", FilePath);
         }
-        std::println("{}: Parsed", FilePath);
+
+        else if (FilePath.ends_with(".png") || FilePath.ends_with(".jpeg") || FilePath.ends_with(".jpg")) {
+            stbi_set_flip_vertically_on_load(true);
+            int w, h, nrc;
+            unsigned char* data = stbi_load(FilePath.c_str(), &w, &h, &nrc, 4);
+
+            std::unique_ptr<Texture> texture = Texture::Create();
+            texture->SendData(data, w, h);
+            stbi_image_free(data);
+
+            Assets::Textures.Add(GetAssetName(FilePath), std::move(texture));
+        } 
     }
 
 }

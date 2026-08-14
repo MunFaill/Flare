@@ -23,3 +23,8 @@ struct TransformComponent {
 struct MeshComponent {
     std::string MeshID = "";
 };
+
+struct MaterialComponent {
+    std::string TextureID = "Default";
+    glm::vec4 Albedo = {1.0f, 1.0f, 1.0f, 1.0f};
+};

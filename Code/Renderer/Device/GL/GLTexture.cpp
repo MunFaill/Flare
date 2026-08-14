@@ -24,6 +24,7 @@ void GLTexture::Unbind() {
 
 void GLTexture::SendData(unsigned char* data, uint32_t Width, uint32_t Height) {
     this->Bind(LocalSlot);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

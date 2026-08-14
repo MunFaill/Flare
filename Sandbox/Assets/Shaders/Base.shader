@@ -33,6 +33,13 @@ in vec3 vNormal;
 in vec2 vTexCoord;
 in vec4 vColor;
 
+struct Material {
+    sampler2D Texture;
+    vec4 Albedo;
+};
+
+uniform Material mat;
+
 vec3 light() {
     vec3 lightPos = vec3(5.0, 5.0, 5.0);
     vec3 lightColor = vec3(1.0);
@@ -46,10 +53,11 @@ vec3 light() {
     float ambientStrenght = 0.1;
     vec3 ambient = ambientStrenght * lightColor;
 
-    vec3 result = (ambient + diffuse) * vColor.xyz;
+    vec3 result = (ambient + diffuse) * mat.Albedo.xyz;
     return result;
 }
 
 void main() {
-    FragmentColor = vec4(light(), vColor.a);
+    vec4 texColor = texture(mat.Texture, vTexCoord);
+    FragmentColor = vec4(light() * texColor.rgb, mat.Albedo.a * texColor.a);
 }

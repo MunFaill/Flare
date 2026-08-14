@@ -35,6 +35,7 @@ target_include_directories(Flare PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/Code"
     "${CMAKE_CURRENT_SOURCE_DIR}/Vendor/Glad"
     "${CMAKE_CURRENT_SOURCE_DIR}/Vendor/cgltf"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Vendor/stb"
 )
 
 target_link_libraries(Flare PUBLIC glfw)
