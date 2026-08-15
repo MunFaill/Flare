@@ -1,7 +1,7 @@
-#include "Scene/Entity/Components.h"
+#include "Scene/Entity/Entity.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
-#include "glm/ext.hpp"
+#include <glm/ext.hpp>
 
 glm::mat4 TransformComponent::GetTransform() const {
     glm::mat4 rotation = glm::yawPitchRoll(glm::radians(Rotation.y), glm::radians(Rotation.x), glm::radians(Rotation.z));

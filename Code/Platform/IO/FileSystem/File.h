@@ -3,5 +3,7 @@
 #include <vector>
 #include <string>
 
-std::string ReadFile(const std::string& FilePath);
-std::vector<std::string> ScanFiles(const std::string& FolderPath);
+struct File {
+    static std::string Read(const std::string& Path);
+    static std::vector<std::string> Scan(const std::string& Path);
+};

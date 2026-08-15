@@ -1,7 +1,7 @@
 #include "Renderer/System/RendererSystem.h"
 #include "Platform/IO/AssetSystem/Asset.h"
-#include "Platform/Window/Window.h"
-#include "Scene/Entity/Components.h"
+#include "Platform/Windowing/Window.h"
+#include "Scene/Entity/Entity.h"
 #include "Scene/Scene.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/trigonometric.hpp"
@@ -38,14 +38,16 @@ void RendererSystem::Update(Scene& scene) {
 
     glm::mat4 viewProjection = projectionMatrix * viewMatrix;
 
-    Assets::Shaders.Get("Base")->Bind();
-
-    Assets::Shaders.Get("Base")->SetMat4("u_ViewProjection", viewProjection);
-
+    if (Assets::Shaders.Has("Base")) {
+        Assets::Shaders.Get("Base")->Bind();
+        Assets::Shaders.Get("Base")->SetMat4("u_ViewProjection", viewProjection);
+    }
     scene.Each<LightComponent, TransformComponent>(
         [this](Entity entity, LightComponent& light, TransformComponent& transform) {
-            Assets::Shaders.Get("Base")->SetVec3("light.LightPos", transform.Position);
-            Assets::Shaders.Get("Base")->SetVec3("light.LightColor", light.LightColor);
+            if (Assets::Shaders.Has("Base")) {
+                Assets::Shaders.Get("Base")->SetVec3("light.LightPos", transform.Position);
+                Assets::Shaders.Get("Base")->SetVec3("light.LightColor", light.LightColor);
+            }
         }
     );
 
@@ -59,14 +61,21 @@ void RendererSystem::Update(Scene& scene) {
 
             if (scene.HasComponent<MaterialComponent>(entity)) {
                 MaterialComponent* mat = scene.GetComponent<MaterialComponent>(entity);
-                Assets::Textures.Get(mat->TextureID)->Bind(0);
-                Assets::Shaders.Get("Base")->SetVec4("material.Albedo", mat->Albedo);
+                if (Assets::Textures.Has(mat->TextureID))
+                    Assets::Textures.Get(mat->TextureID)->Bind(0);
+
+                if (Assets::Shaders.Has("Base"))
+                    Assets::Shaders.Get("Base")->SetVec4("material.Albedo", mat->Albedo);
             } else {
-                Assets::Textures.Get("Default")->Bind(0);
-                Assets::Shaders.Get("Base")->SetVec4("material.Albedo", glm::vec4(1.0f));
+                if (Assets::Textures.Has("Default"))
+                    Assets::Textures.Get("Default")->Bind(0);
+
+                if (Assets::Shaders.Has("Base"))
+                    Assets::Shaders.Get("Base")->SetVec4("material.Albedo", glm::vec4(1.0f));
             }
 
-            Assets::Shaders.Get("Base")->SetMat4("u_Model", transform.GetTransform());
+            if (Assets::Shaders.Has("Base"))
+                Assets::Shaders.Get("Base")->SetMat4("u_Model", transform.GetTransform());
 
             model->Bind();
             m_Context->DrawCall(model->GetIndexCount());

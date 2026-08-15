@@ -1,50 +1,58 @@
 #include "Core/Application.h"
-#include "Platform/Window/WindowBackend.h"
-#include "Scene/Scene.h"
+#include "Platform/Windowing/WindowBackend.h"
+
 #include <print>
 
-static Window InternDefaultWindow = {};
-static Scene InternDefaultScene = {};
-static RendererSystem InternDefaultRendererSystem = {};
-static Time InternTime = {};
-
 void Application::Run() {
+    std::println("Application initializing");
+
     WindowBackend::Init();
+    
+    Context.window = std::make_unique<Window>();
+    Context.time = std::make_unique<Time>();
+    Context.file = std::make_unique<File>();
+    Context.assets = std::make_unique<Assets>();
+    Context.assetProcessor = std::make_unique<AssetProcessor>();
+    Context.scene = std::make_unique<Scene>();
+    Context.renderer = std::make_unique<RendererSystem>();
 
-    if (!Context.DefaultWindow) Context.DefaultWindow = &InternDefaultWindow;
-    if (!Context.DefaultScene) Context.DefaultScene = &InternDefaultScene;
-    if (!Context.DefaultRenderer) Context.DefaultRenderer = &InternDefaultRendererSystem;
-    if (!Context.Delta) Context.Delta = &InternTime;
+    OnSetUp();
 
-    if (WindowTilte != "") Context.DefaultWindow->Title = WindowTilte;
-    if (WindowWidth != 0) Context.DefaultWindow->Width = WindowWidth;
-    if (WIndowHeight != 0) Context.DefaultWindow->Height = WIndowHeight;
-
-    Context.DefaultWindow->Init();
-    Context.DefaultRenderer->Init(*Context.DefaultWindow);
-    Context.Delta->InitTime();
-
-    std::println("Application initialized");
+    Context.window->Init();
+    Context.time->InitTime();
+    Context.renderer->Init(*Context.window);
 
     OnStart();
-    
-    std::println("Application loop");
-    while(Running) {
 
-        if (Context.Delta) Context.Delta->CalculateTime();
-        if (Context.DefaultWindow && Context.DefaultWindow->CloseEvent()) Running = false;
-        if (Context.DefaultScene) Context.DefaultRenderer->Update(*Context.DefaultScene);
+    std::println("Application loop");
+    // After-start setup
+    while (Running) {
+        if (Context.window->CloseEvent()) Running = false;
+        Context.time->CalculateTime();
+        Context.renderer->Update(*Context.scene);
 
         OnUpdate();
 
-        if (Context.DefaultWindow) Context.DefaultWindow->Update(); // Swap buffers
+        Context.window->SwapBuffers();
     }
 
+    std::println("Application shtudown");
     OnStop();
-    std::println("Application shutdown");
+    // Shutdown here
 
-    if (Context.DefaultRenderer) Context.DefaultRenderer->Shutdown();
-    if (Context.DefaultWindow) Context.DefaultWindow->Shutdown();
-    
+    Context.assets->Shaders.Clear();
+    Context.assets->Textures.Clear();
+    Context.assets->Meshes.Clear();
+
+    Context.renderer->Shutdown();
+    Context.window->Shutdown();
     WindowBackend::Shutdown();
+
+    Context.window.reset();
+    Context.time.reset();
+    Context.file.reset();
+    Context.assets.reset();
+    Context.assetProcessor.reset();
+    Context.scene.reset();
+    Context.renderer.reset();
 }

@@ -1,21 +1,18 @@
 #pragma once
 
 #include "Core/Engine.h"
-#include <string>
 
 class Application {
     public:
         virtual ~Application() = default;
 
-        inline virtual void OnStart() {}
-        inline virtual void OnUpdate() {}
-        inline virtual void OnStop() {}
+        virtual void OnSetUp() = 0;
+        virtual void OnStart() = 0;
+        virtual void OnUpdate() = 0;
+        virtual void OnStop() = 0;
 
         void Run();
-
     protected:
-        EngineContext Context;
         bool Running = true;
-        std::string WindowTilte = "";
-        uint32_t WindowWidth = 0, WIndowHeight = 0;
+        EngineContext Context;
 };

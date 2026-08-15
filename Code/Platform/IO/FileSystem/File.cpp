@@ -4,42 +4,41 @@
 #include <fstream>
 #include <print>
 #include <sstream>
-#include <string>
-#include <vector>
 
-std::string ReadFile(const std::string& FilePath) {
-    std::filesystem::path filePath = FilePath;
-    std::ifstream file(filePath);
+std::string File::Read(const std::string& Path) {
+    std::filesystem::path FilePath = Path;
+    std::ifstream file(FilePath);
     std::stringstream buffer;
 
-    if (!std::filesystem::exists(filePath)) {
-        std::println("Error: {} does not exist", FilePath);
+    if (!std::filesystem::exists(FilePath)) {
+        std::println("Error: {} does not exist", Path);
         return "";
     }
 
-    if (!std::filesystem::is_regular_file(filePath)) {
-        std::println("File {} is a directory", FilePath);
+    if (!std::filesystem::is_regular_file(FilePath)) {
+        std::println("Error: {} is a directory", Path);
         return "";
     }
 
     if (file.is_open()) {
-        std::println("File {} found", FilePath);
+        std::println("File {} found", Path);
         buffer << file.rdbuf();
         return buffer.str();
     }
+
     return "";
 }
 
-std::vector<std::string> ScanFiles(const std::string& FolderPath) {
+std::vector<std::string> File::Scan(const std::string& Path) {
     std::vector<std::string> FilesInPath;
-    std::filesystem::path folderPath = FolderPath;
+    std::filesystem::path FolderPath = Path;
 
-    if (!std::filesystem::exists(folderPath)) {
-        std::println("Error: Folder {} does not exist", FolderPath);
+    if (!std::filesystem::exists(Path)) {
+        std::println("Error: Folder {} does not exist", Path);
     }
 
-    if (std::filesystem::is_directory(folderPath)) {
-        for (const std::filesystem::directory_entry& entry: std::filesystem::recursive_directory_iterator(folderPath)) {
+    if (std::filesystem::is_directory(FolderPath)) {
+        for (const std::filesystem::directory_entry& entry: std::filesystem::recursive_directory_iterator(FolderPath)) {
             if (std::filesystem::is_regular_file(entry.status())) {
                 std::println("File found: {}", entry.path().string());
                 FilesInPath.push_back(entry.path().string());

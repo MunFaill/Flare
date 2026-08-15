@@ -1,57 +1,36 @@
 #include "app.h"
-#include "Scene/Entity/Components.h"
-#include "Scene/Entity/Entity.h"
 
-#include <string>
-#include <vector>
-
-// global Entity
-static Entity Camera;
-static Entity Cube;
-static Entity Light;
-
-App::App() {
-    // Set the window title
-    WindowTilte = "Testing";
-    // Use WindowWidth or WindowHeight to change the size, or, use Context.DefaultWindow.Title . . .
+void Sandbox::OnSetUp() {
+    // Called once after the creation of the systems and before their execution.
+    Context.window->Title = "Sandbox";
 }
 
-App::~App() {
+void Sandbox::OnStart() {
+    // Called once after the creation and execution of the systems.
 
+    std::vector<std::string> FilesContainer = Context.file->Scan("Sandbox/Assets");
+    Context.assetProcessor->Process(FilesContainer);
+
+    // Create entities
+    Entity camera = Context.scene->CreateEntity();
+    Entity cube = Context.scene->CreateEntity();
+    Entity light = Context.scene->CreateEntity();
+
+    // Add component to entities
+    Context.scene->AddComponent<TransformComponent>(camera).Position = {0.0f, 0.0f, 5.0f}; // Set custom configs
+    Context.scene->AddComponent<CameraComponent>(camera); // Use the default configs
+
+    Context.scene->AddComponent<TransformComponent>(cube);
+    Context.scene->AddComponent<MeshComponent>(cube).MeshID = "Cube";
+
+    Context.scene->AddComponent<TransformComponent>(light).Position = {0.0f, 5.0f, 2.0f};
+    Context.scene->AddComponent<LightComponent>(light).LightColor = {1.0f, 1.0f, 1.0f};
 }
 
-void App::OnStart() {
-    // Scan a folder and return a vector of the assets path (e.g: image.png, model.glb)
-    std::vector<std::string> assets_files = ScanFiles("Sandbox/Assets");
-    AssetProcessor(assets_files); // Process every file found and return an asset with the file name (e.g image.png -> image)
-
-    Assets::Textures.Get("Default")->Mipmaps(true); // Find an image asset with the name Default and enable mipmaps
-
-    // Create Entities 
-    Camera = Context.DefaultScene->CreateEntity();
-    Cube = Context.DefaultScene->CreateEntity();
-    Light = Context.DefaultScene->CreateEntity();
-
-    // Add components and set values for the entity
-    Context.DefaultScene->AddComponent<TransformComponent>(Camera).Position = {0.0f, 0.0f, 5.0f}; // The default position and rotation is 0
-    Context.DefaultScene->AddComponent<CameraComponent>(Camera).Current = true; // True by default, use this for multiple cameras
-
-    Context.DefaultScene->AddComponent<TransformComponent>(Cube).Position = {-1.0f, 0.0f, 0.0f};
-    Context.DefaultScene->AddComponent<MeshComponent>(Cube).MeshID = "Cube"; // Pick a mesh by their name/id
-
-    Context.DefaultScene->AddComponent<TransformComponent>(Light).Position = {0.0f, 5.0f, 2.0f};
-    Context.DefaultScene->AddComponent<LightComponent>(Light).LightColor = {1.0f, 0.0f, 1.0f};
+void Sandbox::OnUpdate() {
+    // Called every frame
 }
 
-void App::OnUpdate() {
-    // Rotate the Cube entity every frame and multiply by delta
-    Context.DefaultScene->GetComponent<TransformComponent>(Cube)->Rotation.y += 50 * Context.Delta->DeltaTime;
-    Context.DefaultScene->GetComponent<TransformComponent>(Cube)->Rotation.z += 50 * Context.Delta->DeltaTime;
-}
-
-void App::OnStop() {
-    // Clear every asset (Mandatory)
-    Assets::Meshes.Clear();
-    Assets::Shaders.Clear();
-    Assets::Textures.Clear();
+void Sandbox::OnStop() {
+    // Called once before the destruction of the systems
 }

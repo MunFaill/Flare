@@ -1,5 +1,5 @@
 #include "Renderer/Device/GL/GLContext.h"
-#include "Platform/Window/Window.h"
+#include "Platform/Windowing/Window.h"
 
 #include <print>
 #define GLAD_GL_IMPLEMENTATION

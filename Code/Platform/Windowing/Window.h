@@ -1,16 +1,16 @@
 #pragma once
 
-#include <string>
 #include <cstdint>
+#include <string>
 
-class GLFWwindow;
+struct GLFWwindow;
 
 struct Window {
-    std::string Title = "";
-    uint32_t Width = 1360, Height = 768;
     void Init();
-    void Update();
     void Shutdown();
+    void SwapBuffers();
     bool CloseEvent();
+    std::string Title = "Untitled";
+    uint16_t Width = 1280, Height = 720;
     GLFWwindow* Handle = nullptr;
 };
