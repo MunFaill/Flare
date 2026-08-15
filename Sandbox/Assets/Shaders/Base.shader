@@ -34,35 +34,42 @@ in vec2 vTexCoord;
 in vec4 vColor;
 
 struct Material {
-    sampler2D Texture;
+    sampler2D Diffuse;
     vec4 Albedo;
+    float Specular;
 };
 
 struct Light {
-    vec3 LightPos;
+    vec3 LightDirection;
     vec3 LightColor;
 };
-
-#define MAX_LIGHTS 8
 
 uniform Material material;
 uniform Light light;
 
+uniform vec3 viewPos;
+
 vec3 lightFunc() {
     vec3 norm = normalize(vNormal);
-    vec3 lightDir = normalize(light.LightPos - vPosition);
+    vec3 lightDir = normalize(-light.LightDirection);
 
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * light.LightColor;
 
+    vec3 viewDir = normalize(viewPos - vPosition);
+    vec3 reflectionDir = reflect(-lightDir, norm);
+
+    float spec = pow(max(dot(viewDir, reflectionDir), 0.0), 32);
+    vec3 specular = material.Specular * spec * light.LightColor;
+
     float ambientStrenght = 0.1;
     vec3 ambient = ambientStrenght * vec3(1.0); // Ambient color
 
-    vec3 result = (ambient + diffuse) * material.Albedo.xyz;
+    vec3 result = (ambient + diffuse + specular) * material.Albedo.xyz;
     return result;
 }
 
 void main() {
-    vec4 texColor = texture(material.Texture, vTexCoord);
+    vec4 texColor = texture(material.Diffuse, vTexCoord);
     FragmentColor = vec4(lightFunc() * texColor.rgb, material.Albedo.a * texColor.a);
 }

@@ -24,11 +24,12 @@ struct MeshComponent {
 };
 
 struct MaterialComponent {
-    std::string TextureID = "Default";
+    std::string DiffuseID = "Default";
     glm::vec4 Albedo = {1.0f, 1.0f, 1.0f, 1.0f};
+    float Specular = 0.5;
 };
 
-struct LightComponent {
+struct DirectionalLightComponent {
     glm::vec3 LightColor = {1.0f, 1.0f, 1.0f};
 };
 
