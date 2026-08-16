@@ -1,6 +1,6 @@
 #include <Renderer/Device/Device.h>
+#include <memory>
 
-#include "Renderer/Device/DeviceTexture.h"
 #include "Renderer/Device/GL/GLBuffers.h"
 #include "Renderer/Device/GL/GLContext.h"
 #include "Renderer/Device/GL/GLMesh.h"
@@ -34,6 +34,26 @@ std::unique_ptr<IndexBuffer> IndexBuffer::Create() {
     switch (CurrentDevice) {
         case None: return nullptr; break;
         case OpenGL: return std::make_unique<GLIndexBuffer>(); break;
+        case Vulkan: return nullptr; break;
+    }
+    return nullptr;
+}
+
+// Frame Buffer
+std::unique_ptr<FrameBuffer> FrameBuffer::Create() {
+    switch (CurrentDevice) {
+        case None: return nullptr; break;
+        case OpenGL: return std::make_unique<GLFrameBuffer>(); break;
+        case Vulkan: return nullptr; break;
+    }
+    return nullptr;
+}
+
+// Render Buffer
+std::unique_ptr<RenderBuffer> RenderBuffer::Create() {
+    switch (CurrentDevice) {
+        case None: return nullptr; break;
+        case OpenGL: return std::make_unique<GLRenderBuffer>(); break;
         case Vulkan: return nullptr; break;
     }
     return nullptr;

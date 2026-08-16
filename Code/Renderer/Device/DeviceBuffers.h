@@ -56,5 +56,5 @@ class RenderBuffer {
         virtual void SendData(uint16_t Width, uint16_t Height) = 0;
         virtual void Attach() = 0;
 
-        std::unique_ptr<RenderBuffer> Create();
+        static std::unique_ptr<RenderBuffer> Create();
 };
