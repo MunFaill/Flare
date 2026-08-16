@@ -35,3 +35,26 @@ class IndexBuffer {
 
         static std::unique_ptr<IndexBuffer> Create();
 };
+
+class FrameBuffer {
+    public:
+        virtual ~FrameBuffer() = default;
+
+        virtual void Bind() = 0;
+        virtual void Unbind() = 0;
+        virtual void AttachTexture(uint32_t& Texture) = 0;
+
+        static std::unique_ptr<FrameBuffer> Create();
+};
+
+class RenderBuffer {
+    public:
+        virtual ~RenderBuffer() = default;
+
+        virtual void Bind() = 0;
+        virtual void Unbind() = 0;
+        virtual void SendData(uint16_t Width, uint16_t Height) = 0;
+        virtual void Attach() = 0;
+
+        std::unique_ptr<RenderBuffer> Create();
+};

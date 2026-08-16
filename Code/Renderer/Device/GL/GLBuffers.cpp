@@ -63,3 +63,65 @@ void GLIndexBuffer::SendData(uint32_t* Data, uint32_t Count) {
     std::println("Data send to index buffer: {}", EBO);
     this->Unbind();
 }
+
+/* ===================================+
+    Frame Buffer
+   ===================================+*/ 
+
+GLFrameBuffer::GLFrameBuffer() {
+    glGenFramebuffers(1, &FBO);
+    std::println("Frame buffer object created: {}", FBO);
+}
+
+GLFrameBuffer::~GLFrameBuffer() {
+    std::println("Frame buffer object deleted: {}", FBO);
+    glDeleteFramebuffers(1, &FBO);
+}
+
+void GLFrameBuffer::Bind() {
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+}
+
+void GLFrameBuffer::Unbind() {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void GLFrameBuffer::AttachTexture(uint32_t& Texture) {
+    this->Bind();
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Texture, 0);
+
+    this->Unbind();
+}
+
+/* ===================================+
+    Render Buffer
+   ===================================+*/ 
+
+GLRenderBuffer::GLRenderBuffer() {
+    glGenRenderbuffers(1, &RBO);
+    std::println("Render buffer created: {}", RBO);
+}
+
+GLRenderBuffer::~GLRenderBuffer() {
+    std::println("Render buffer deleted: {}", RBO);
+    glDeleteRenderbuffers(1, &RBO);
+}
+
+void GLRenderBuffer::Bind() {
+    glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+}
+
+void GLRenderBuffer::Unbind() {
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+}
+
+void GLRenderBuffer::SendData(uint16_t Width, uint16_t Height) {
+    this->Bind();
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, Width, Height);
+    this->Unbind();
+}
+
+void GLRenderBuffer::Attach() {
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
+}
