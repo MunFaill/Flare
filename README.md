@@ -36,8 +36,8 @@ See [Sandbox](Sandbox) for use examples.
 ![GLTF Rendering](Docs/FlareScreenShot.png)
 
 ### What to come:
-- [] Forward+ rendering
-- [] Better material (With multiple texture chanels for object)
-- [] Skybox
-- [] Fix camera stretch
-- [] Basic UI
+- [ ] Forward+ rendering
+- [ ] Better material (With multiple texture chanels for object)
+- [ ] Skybox
+- [ ] Fix camera stretch
+- [ ] Basic UI
