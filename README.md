@@ -17,6 +17,9 @@ Inspired on the Urho3D engine and Hazel engine
 
 ### Building from source
 
+> [!CAUTION]
+> Never run scripts without researching or reading what they do!
+
 Unix-like systems
 ``` shell
     # Clone
