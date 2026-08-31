@@ -1,5 +1,4 @@
 #include "app.h"
-#include "Scene/Entity/Entity.h"
 
 static Entity camera;
 static Entity cube;
