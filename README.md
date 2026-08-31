@@ -31,4 +31,5 @@ Unix-like systems
 See [Sandbox](Sandbox) for use examples.
 
 ### Images:
+![Multi Lights](Docs/MultiLightSpinCube.png)
 ![GLTF Rendering](Docs/FlareScreenShot.png)
