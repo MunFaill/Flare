@@ -2,10 +2,10 @@
 
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/trigonometric.hpp>
+#include <Renderer/Device/Device.h>
 
 #include "Platform/IO/AssetSystem/Asset.h"
 #include "Platform/Windowing/Window.h"
-#include "Renderer/Device/Device.h"
 #include "Scene/Entity/Entity.h"
 #include "Scene/Scene.h"
 
@@ -24,7 +24,7 @@ void RendererSystem::Init(Window& window) {
 void RendererSystem::Update(Scene& scene) {
     m_Context->Clear({0.0f, 0.0f, 0.0f, 1.0f});
 
-    auto* baseShader = Assets::Shaders.Has("Base") ? Assets::Shaders.Get("Base") : nullptr;
+    Shader* baseShader = Assets::Shaders.Has("Base") ? Assets::Shaders.Get("Base") : nullptr;
 
     glm::mat4 viewMatrix = glm::mat4(1.0f);
     glm::mat4 projectionMatrix = glm::mat4(1.0f);
@@ -50,11 +50,35 @@ void RendererSystem::Update(Scene& scene) {
         baseShader->SetMat4("u_ViewProjection", viewProjection);
     }
 
+    scene.Each<AmbientComponent>(
+        [&](Entity entity, AmbientComponent& ambient) {
+            if (baseShader) {
+                baseShader->SetVec4("environment.AmbientColor", ambient.AmbientColor);
+            }
+        }
+    );
+
     scene.Each<DirectionalLightComponent, TransformComponent>(
         [&](Entity entity, DirectionalLightComponent& light, TransformComponent& transform) {
             if (baseShader) {
-                baseShader->SetVec3("light.LightDirection", transform.Rotation);
-                baseShader->SetVec3("light.LightColor", light.LightColor);
+                baseShader->SetVec3("dirlight.LightDirection", transform.Rotation);
+                baseShader->SetVec3("dirlight.LightColor", light.LightColor);
+                baseShader->SetVec3("dirlight.Diffuse", light.Diffuse);
+                baseShader->SetVec3("dirlight.Specular", light.Specular);
+            }
+        }
+    );
+
+    scene.Each<PointLightComponent, TransformComponent>(
+        [&](Entity entity, PointLightComponent& light, TransformComponent& transform) {
+            if (baseShader) {
+                baseShader->SetVec3("pointlight.LightDirection", transform.Position);
+                baseShader->SetVec3("pointlight.LightColor", light.LightColor);
+                baseShader->SetVec3("pointlight.Diffuse", light.Diffuse);
+                baseShader->SetVec3("pointlight.Specular", light.Specular);
+                baseShader->SetFloat("pointlight.Constant", light.Constant);
+                baseShader->SetFloat("pointlight.Linear", light.Linear);
+                baseShader->SetFloat("pointlight.Quadratic", light.Quadratic);
             }
         }
     );

@@ -57,7 +57,9 @@ struct Scene{
             ComponentStorage<TransformComponent>,
             ComponentStorage<MeshComponent>,
             ComponentStorage<CameraComponent>,
+            ComponentStorage<AmbientComponent>,
             ComponentStorage<MaterialComponent>,
-            ComponentStorage<DirectionalLightComponent>
+            ComponentStorage<DirectionalLightComponent>,
+            ComponentStorage<PointLightComponent>
         > m_Components;
 };

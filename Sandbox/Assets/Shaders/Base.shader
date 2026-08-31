@@ -33,43 +33,80 @@ in vec3 vNormal;
 in vec2 vTexCoord;
 in vec4 vColor;
 
+struct Envoironment {
+    vec4 AmbientColor;
+};
+
 struct Material {
     sampler2D Diffuse;
     vec4 Albedo;
     float Specular;
 };
 
-struct Light {
+struct DirectionalLight {
     vec3 LightDirection;
     vec3 LightColor;
+    vec3 Diffuse;
+    vec3 Specular;
 };
 
-uniform Material material;
-uniform Light light;
+struct PointLight {
+    vec3 LightPosition;
+    vec3 LightColor;
+    vec3 Diffuse;
+    vec3 Specular;
+    float Constant;
+    float Linear;
+    float Quadratic;
+};
 
+#define MAX_LIGHTS 4
+
+uniform Envoironment environment;
+uniform Material material;
+uniform DirectionalLight dirlight;
+uniform PointLight pointlight;
 uniform vec3 viewPos;
 
-vec3 lightFunc() {
-    vec3 norm = normalize(vNormal);
+vec3 DirLightFunc(DirectionalLight light, vec3 normal, vec3 viewDir) {
     vec3 lightDir = normalize(-light.LightDirection);
+    float diff = max(dot(normal, lightDir), 0.0);
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Specular);
 
-    float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = diff * light.LightColor;
+    vec3 diffuse = light.Diffuse * diff * vec3(texture(material.Diffuse, vTexCoord));
+    vec3 specular = light.Specular * spec * vec3(texture(material.Diffuse, vTexCoord));
 
-    vec3 viewDir = normalize(viewPos - vPosition);
-    vec3 reflectionDir = reflect(-lightDir, norm);
+    return (diffuse + specular) * light.LightColor;
+}
 
-    float spec = pow(max(dot(viewDir, reflectionDir), 0.0), 32);
-    vec3 specular = material.Specular * spec * light.LightColor;
+vec3 PointLightFunc(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir) {
+    vec3 lightDir = normalize(light.LightPosition - fragPos);
+    float diff = max(dot(normal, lightDir), 0.0);
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Specular);
 
-    float ambientStrenght = 0.1;
-    vec3 ambient = ambientStrenght * vec3(1.0); // Ambient color
+    float distance = length(light.LightPosition - fragPos);
+    float attenuation = 1.0 / (light.Constant + light.Linear * distance + light.Quadratic * (distance * distance));
 
-    vec3 result = (ambient + diffuse + specular) * material.Albedo.xyz;
-    return result;
+    vec3 diffuse = light.Diffuse * diff * vec3(texture(material.Diffuse, vTexCoord));
+    vec3 specular = light.Specular * spec * vec3(texture(material.Diffuse, vTexCoord));
+
+    diffuse *= attenuation;
+    specular *= attenuation;
+
+    return (diffuse + specular) * light.LightColor;
 }
 
 void main() {
-    vec4 texColor = texture(material.Diffuse, vTexCoord);
-    FragmentColor = vec4(lightFunc() * texColor.rgb, material.Albedo.a * texColor.a);
+    vec3 normal = normalize(vNormal);
+    vec3 viewDir = normalize(viewPos - vPosition);
+
+    vec3 result = DirLightFunc(dirlight, normal, viewDir) + PointLightFunc(pointlight, normal, vPosition, viewDir);
+
+    for (int i = 0; i < MAX_LIGHTS; i++) {
+        result += PointLightFunc(pointlight, normal, vPosition, viewDir);
+    }
+
+    FragmentColor = vec4(result, 1.0);
 }

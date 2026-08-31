@@ -1,8 +1,11 @@
 #include "app.h"
+#include "Scene/Entity/Entity.h"
 
 static Entity camera;
 static Entity cube;
 static Entity light;
+static Entity ambient;
+static Entity plight;
 
 void Sandbox::OnSetUp() {
     // Called once after the creation of the systems and before their execution.
@@ -19,6 +22,8 @@ void Sandbox::OnStart() {
     camera = Context.scene->CreateEntity();
     cube = Context.scene->CreateEntity();
     light = Context.scene->CreateEntity();
+    ambient = Context.scene->CreateEntity();
+    plight = Context.scene->CreateEntity();
 
     // Add component to entities
     Context.scene->AddComponent<TransformComponent>(camera).Position = {0.0f, 0.0f, 5.0f}; // Set custom configs
@@ -29,6 +34,12 @@ void Sandbox::OnStart() {
 
     Context.scene->AddComponent<TransformComponent>(light).Rotation = {-0.2f, -1.0f, -0.3f};
     Context.scene->AddComponent<DirectionalLightComponent>(light).LightColor = {1.0f, 1.0f, 1.0f};
+
+    Context.scene->AddComponent<TransformComponent>(ambient);
+    Context.scene->AddComponent<AmbientComponent>(ambient);
+
+    Context.scene->AddComponent<TransformComponent>(plight).Position = {3.0f, -1.0f, 2.0f};
+    Context.scene->AddComponent<PointLightComponent>(plight).LightColor = {1.0f, 0.0f, 0.0f};
 }
 
 void Sandbox::OnUpdate() {
