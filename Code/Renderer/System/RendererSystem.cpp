@@ -70,7 +70,7 @@ void RendererSystem::Update(Scene& scene) {
     );
 
     int pointLightCount = 0;
-    const int MAX_POINT_LIGHTS = 4;
+    const int MAX_POINT_LIGHTS = 8;
 
     scene.Each<PointLightComponent, TransformComponent>(
         [&](Entity entity, PointLightComponent& light, TransformComponent& transform) {

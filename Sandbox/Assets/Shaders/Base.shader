@@ -25,7 +25,7 @@ void main() {
 
 #[FRAGMENT]
 #version 460 core
-#define MAX_LIGHTS 4
+#define MAX_LIGHTS 8
 
 out vec4 FragmentColor;
 
