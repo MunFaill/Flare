@@ -23,7 +23,7 @@ void Sandbox::OnStart() {
     camera = Context.scene->CreateEntity();
     ambient = Context.scene->CreateEntity();
     cube = Context.scene->CreateEntity();
-    //sun = Context.scene->CreateEntity();
+    sun = Context.scene->CreateEntity();
     light = Context.scene->CreateEntity();
     light2 = Context.scene->CreateEntity();
     light3 = Context.scene->CreateEntity();
@@ -38,8 +38,8 @@ void Sandbox::OnStart() {
     Context.scene->AddComponent<TransformComponent>(cube);
     Context.scene->AddComponent<MeshComponent>(cube).MeshID = "Cube";
 
-    //Context.scene->AddComponent<TransformComponent>(sun).Rotation = {-0.2f, -1.0f, -0.3f};
-    //Context.scene->AddComponent<DirectionalLightComponent>(sun).LightColor = {1.0f, 1.0f, 1.0f};
+    Context.scene->AddComponent<TransformComponent>(sun).Rotation = {-0.2f, -1.0f, -0.3f};
+    Context.scene->AddComponent<DirectionalLightComponent>(sun).LightColor = {1.0f, 1.0f, 1.0f};
 
     Context.scene->AddComponent<TransformComponent>(light).Position = {1.0f, -1.0f, 2.0f};
     Context.scene->AddComponent<PointLightComponent>(light).LightColor = {1.0f, 0.0f, 0.0f};

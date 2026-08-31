@@ -10,9 +10,10 @@ Inspired on the Urho3D engine and Hazel engine
 - GLTF loader (by cgltf);
 - Image loader (by stb);
 - Custom Entity Component;
-- OpenGL 4.6 core (by Glad);
+- OpenGL 4.6 core and Vulkan -vulkan not yet implemented- (by Glad 2.0);
 - Windowing (by glfw);
 - Math (by glm).
+- Forward rendering (8 lights + one directional light are suported)
 
 ### Building from source
 
@@ -30,6 +31,13 @@ Unix-like systems
 
 See [Sandbox](Sandbox) for use examples.
 
-### Images:
+### Images from Sandbox application:
 ![Multi Lights](Docs/MultiLightSpinCube.png)
 ![GLTF Rendering](Docs/FlareScreenShot.png)
+
+### What to come:
+- [] Forward+ rendering
+- [] Better material (With multiple texture chanels for object)
+- [] Skybox
+- [] Fix camera stretch
+- [] Basic UI
