@@ -35,7 +35,7 @@ struct MaterialComponent {
 
 struct DirectionalLightComponent {
     glm::vec3 LightColor{1.0f};
-    glm::vec3 Diffuse{1.0f};
+    glm::vec3 Diffuse{0.5f};
     glm::vec3 Specular{0.5f};
 };
 

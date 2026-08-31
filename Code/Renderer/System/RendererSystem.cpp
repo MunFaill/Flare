@@ -69,19 +69,30 @@ void RendererSystem::Update(Scene& scene) {
         }
     );
 
+    int pointLightCount = 0;
+    const int MAX_POINT_LIGHTS = 4;
+
     scene.Each<PointLightComponent, TransformComponent>(
         [&](Entity entity, PointLightComponent& light, TransformComponent& transform) {
-            if (baseShader) {
-                baseShader->SetVec3("pointlight.LightDirection", transform.Position);
-                baseShader->SetVec3("pointlight.LightColor", light.LightColor);
-                baseShader->SetVec3("pointlight.Diffuse", light.Diffuse);
-                baseShader->SetVec3("pointlight.Specular", light.Specular);
-                baseShader->SetFloat("pointlight.Constant", light.Constant);
-                baseShader->SetFloat("pointlight.Linear", light.Linear);
-                baseShader->SetFloat("pointlight.Quadratic", light.Quadratic);
+            if (baseShader && pointLightCount < MAX_POINT_LIGHTS) {
+                std::string baseName = "pointlights[" + std::to_string(pointLightCount) + "].";
+
+                baseShader->SetVec3(baseName + "LightPosition", transform.Position);
+                baseShader->SetVec3(baseName + "LightColor", light.LightColor);
+                baseShader->SetVec3(baseName + "Diffuse", light.Diffuse);
+                baseShader->SetVec3(baseName + "Specular", light.Specular);
+                baseShader->SetFloat(baseName + "Constant", light.Constant);
+                baseShader->SetFloat(baseName + "Linear", light.Linear);
+                baseShader->SetFloat(baseName + "Quadratic", light.Quadratic);
+
+                pointLightCount++;
             }
         }
     );
+
+    if (baseShader) {
+        baseShader->SetInt("u_NumPointLights", pointLightCount);
+    }
 
     scene.Each<MeshComponent, TransformComponent>(
         [this, &scene, baseShader](Entity entity, MeshComponent& mesh, TransformComponent& transform) {
