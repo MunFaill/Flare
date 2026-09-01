@@ -37,7 +37,8 @@ void Sandbox::OnStart() {
 
     Context.scene->AddComponent<TransformComponent>(cube);
     Context.scene->AddComponent<MeshComponent>(cube).MeshID = "Cube";
-
+    Context.scene->AddComponent<MaterialComponent>(cube).SpecularPower = 128.0f;
+    
     Context.scene->AddComponent<TransformComponent>(sun).Rotation = {-0.2f, -1.0f, -0.3f};
     Context.scene->AddComponent<DirectionalLightComponent>(sun).LightColor = {1.0f, 1.0f, 1.0f};
 

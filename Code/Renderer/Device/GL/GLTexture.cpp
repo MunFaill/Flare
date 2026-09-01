@@ -15,10 +15,12 @@ GLTexture::~GLTexture() {
 
 void GLTexture::Bind(uint32_t Slot) {
     LocalSlot = Slot;
+    glActiveTexture(GL_TEXTURE0 + Slot);
     glBindTexture(GL_TEXTURE_2D, TextureObject);
 }
 
 void GLTexture::Unbind() {
+    glActiveTexture(GL_TEXTURE0 + LocalSlot);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 

@@ -40,8 +40,9 @@ struct Envoironment {
 
 struct Material {
     sampler2D Diffuse;
+    sampler2D Specular;
     vec4 Albedo;
-    float Specular;
+    float SpecularPower;
 };
 
 struct DirectionalLight {
@@ -83,26 +84,36 @@ vec4 GetBaseColor() {
     return texColor * albedo * vertexCol;
 }
 
-vec3 DirLightFunc(DirectionalLight light, vec3 normal, vec3 viewDir, vec3 baseColor) {
+vec4 GetSpecularColor() {
+    vec4 texColor = texture(material.Specular, vTexCoord);
+    
+    if (texColor.a == 0.0) {
+        texColor = vec4(1.0);
+    }
+
+    return texColor;
+}
+
+vec3 DirLightFunc(DirectionalLight light, vec3 normal, vec3 viewDir, vec3 baseColor, vec3 specColor) {
     if (length(light.LightColor) <= 0.001 || length(light.LightDirection) <= 0.001) {
         return vec3(0.0);
     }
 
     vec3 lightDir = normalize(-light.LightDirection);
+
     float diff = max(dot(normal, lightDir), 0.0);
+    vec3 diffuse = light.Diffuse * diff * baseColor;
     
     vec3 reflectDir = reflect(-lightDir, normal);
-    
-    float specPower = max(material.Specular, 1.0);
+    float specPower = max(material.SpecularPower, 1.0);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), specPower);
 
-    vec3 diffuse = light.Diffuse * diff * baseColor;
-    vec3 specular = light.Specular * spec * baseColor;
+    vec3 specular = light.Specular * spec * specColor;
 
     return (diffuse + specular) * light.LightColor;
 }
 
-vec3 PointLightFunc(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 baseColor) {
+vec3 PointLightFunc(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 baseColor, vec3 specColor) {
     if (length(light.LightColor) <= 0.001) {
         return vec3(0.0);
     }
@@ -111,7 +122,7 @@ vec3 PointLightFunc(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, v
     float diff = max(dot(normal, lightDir), 0.0);
     vec3 reflectDir = reflect(-lightDir, normal);
 
-    float specPower = max(material.Specular, 1.0);
+    float specPower = max(material.SpecularPower, 1.0);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), specPower);
 
     float distance = length(light.LightPosition - fragPos);
@@ -120,7 +131,7 @@ vec3 PointLightFunc(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, v
     float attenuation = denom > 0.0 ? (1.0 / denom) : 0.0;
 
     vec3 diffuse = light.Diffuse * diff * baseColor;
-    vec3 specular = light.Specular * spec * baseColor;
+    vec3 specular = light.Specular * spec * specColor;
 
     diffuse *= attenuation;
     specular *= attenuation;
@@ -131,7 +142,9 @@ vec3 PointLightFunc(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, v
 void main() {
     vec3 normal = normalize(vNormal);
     vec3 viewDir = normalize(viewPos - vPosition);
+    
     vec4 baseColor = GetBaseColor();
+    vec4 specColor = GetSpecularColor();
 
     vec3 ambientContrib = environment.AmbientColor.rgb;
     if (length(ambientContrib) <= 0.001) {
@@ -141,10 +154,10 @@ void main() {
     }
     vec3 result = ambientContrib * baseColor.rgb;
 
-    result += DirLightFunc(dirlight, normal, viewDir, baseColor.rgb);
+    result += DirLightFunc(dirlight, normal, viewDir, baseColor.rgb, specColor.rgb);
 
     for (int i = 0; i < u_NumPointLights; i++) {
-        result += PointLightFunc(pointlights[i], normal, vPosition, viewDir, baseColor.rgb);
+        result += PointLightFunc(pointlights[i], normal, vPosition, viewDir, baseColor.rgb, specColor.rgb);
     }
 
     FragmentColor = vec4(result, baseColor.a);

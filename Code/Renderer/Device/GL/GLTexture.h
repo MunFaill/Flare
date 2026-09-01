@@ -13,6 +13,7 @@ class GLTexture : public Texture {
         void Unbind() override;
         void SendData(unsigned char* data, uint32_t Width, uint32_t Height) override;
         void Mipmaps(bool state) override;
+        inline uint32_t GetSlot() override {return LocalSlot;}
     private:
         uint32_t TextureObject = 0;
         uint32_t LocalSlot = 0;

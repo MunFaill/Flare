@@ -28,9 +28,10 @@ struct AmbientComponent {
 };
 
 struct MaterialComponent {
-    std::string DiffuseID = "Default";
+    std::string DiffuseID = "DefaultDiffuse";
+    std::string SpecularID = "DefaultSpecular";
     glm::vec4 Albedo{1.0f};
-    float Specular = 0.5;
+    float SpecularPower = 32.0f;
 };
 
 struct DirectionalLightComponent {
