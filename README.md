@@ -40,7 +40,7 @@ See [Sandbox](Sandbox) for use examples.
 
 ### What to come:
 - [ ] Forward+ rendering
-- [ ] Better material (With multiple texture chanels for object)
+- [x] Better material (With multiple texture chanels for object)
 - [ ] Skybox
 - [ ] Fix camera stretch
 - [ ] Basic UI
