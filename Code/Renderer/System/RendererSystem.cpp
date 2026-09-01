@@ -105,28 +105,18 @@ void RendererSystem::Update(Scene& scene) {
                 baseShader->SetInt("material.Diffuse", 0);
                 baseShader->SetInt("material.Specular", 1);
 
-                if (scene.HasComponent<MaterialComponent>(entity)) {
-                    MaterialComponent* mat = scene.GetComponent<MaterialComponent>(entity);
-                    
-                    baseShader->SetFloat("material.SpecularPower", mat->SpecularPower);
-                    baseShader->SetVec4("material.Albedo", mat->Albedo);
+                MaterialComponent* mat = &mesh.Material;
+                
+                baseShader->SetFloat("material.SpecularPower", mat->SpecularPower);
+                baseShader->SetVec4("material.Albedo", mat->Albedo);
+                if (Assets::Textures.Has(mat->DiffuseID)) {
+                    Assets::Textures.Get(mat->DiffuseID)->Bind(0);
+                }
 
-                    if (Assets::Textures.Has(mat->DiffuseID)) {
-                        Assets::Textures.Get(mat->DiffuseID)->Bind(0);
-                    }
-
-                    if (Assets::Textures.Has(mat->SpecularID)) {
-                        Assets::Textures.Get(mat->SpecularID)->Bind(1);
-                    } else if (Assets::Textures.Has("Default")) {
-                        Assets::Textures.Get("Default")->Bind(1);
-                    }
-                } else {
-                    if (Assets::Textures.Has("Default")) {
-                        Assets::Textures.Get("Default")->Bind(0);
-                        Assets::Textures.Get("Default")->Bind(1);
-                    }
-                    baseShader->SetVec4("material.Albedo", glm::vec4(1.0f));
-                    baseShader->SetFloat("material.SpecularPower", 32.0f);
+                if (Assets::Textures.Has(mat->SpecularID)) {
+                    Assets::Textures.Get(mat->SpecularID)->Bind(1);
+                } else if (Assets::Textures.Has("Default")) {
+                    Assets::Textures.Get("Default")->Bind(1);
                 }
 
                 baseShader->SetMat4("u_Model", transform.GetTransform());

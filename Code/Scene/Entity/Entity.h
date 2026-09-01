@@ -19,19 +19,20 @@ struct TransformComponent {
     glm::mat4 GetTransform() const;
 };
 
-struct MeshComponent {
-    std::string MeshID = "";
-};
-
-struct AmbientComponent {
-    glm::vec4 AmbientColor{1.0f};
-};
-
 struct MaterialComponent {
     std::string DiffuseID = "DefaultDiffuse";
     std::string SpecularID = "DefaultSpecular";
     glm::vec4 Albedo{1.0f};
     float SpecularPower = 32.0f;
+};
+
+struct MeshComponent {
+    std::string MeshID = "";
+    MaterialComponent Material = {};
+};
+
+struct AmbientComponent {
+    glm::vec4 AmbientColor{1.0f};
 };
 
 struct DirectionalLightComponent {
