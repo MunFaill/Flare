@@ -13,4 +13,5 @@ struct RendererSystem {
     void Shutdown();
     private:
         std::unique_ptr<DeviceContext> m_Context;
+        Window* m_Window = nullptr;
 };

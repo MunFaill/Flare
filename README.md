@@ -42,5 +42,5 @@ See [Sandbox](Sandbox) for use examples.
 - [ ] Forward+ rendering
 - [x] Better material (With multiple texture chanels for object)
 - [ ] Skybox
-- [ ] Fix camera stretch
+- [x] Fix camera stretch
 - [ ] Basic UI

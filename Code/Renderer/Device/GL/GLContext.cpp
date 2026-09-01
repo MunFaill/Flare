@@ -8,6 +8,12 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
+
+    Window* userWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
+    if (userWindow) {
+        userWindow->Width = width;
+        userWindow->Height = height;
+    }
 }  
 
 void GLContext::Initialize(Window& window) {
@@ -20,6 +26,7 @@ void GLContext::Initialize(Window& window) {
     std::println("GL context configured");
 
     glfwMakeContextCurrent(window.Handle);
+    glfwSetWindowUserPointer(window.Handle, &window);
 
     if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
         std::println("Error to load GLAD");

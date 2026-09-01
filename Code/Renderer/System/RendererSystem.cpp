@@ -9,8 +9,6 @@
 #include "Scene/Entity/Entity.h"
 #include "Scene/Scene.h"
 
-static Window internWindow;
-
 void RendererSystem::Init(Window& window) {
     m_Context = DeviceContext::Create();
     m_Context->Initialize(window);
@@ -18,7 +16,7 @@ void RendererSystem::Init(Window& window) {
     m_Context->DepthTest(true);
     m_Context->Blend(true);
     
-    internWindow = window;
+    m_Window = &window;
 }
 
 void RendererSystem::Update(Scene& scene) {
@@ -34,7 +32,11 @@ void RendererSystem::Update(Scene& scene) {
             if (!camera.Current) return;
 
             viewMatrix = glm::inverse(transform.GetTransform());
-            float aspectRatio = static_cast<float>(internWindow.Width) / static_cast<float>(internWindow.Height);
+
+            float width = static_cast<float>(m_Window->Width);
+            float height = static_cast<float>(m_Window->Height);
+            float aspectRatio = width / height;
+            
             projectionMatrix = glm::perspective(glm::radians(camera.Fov), aspectRatio, camera.Near, camera.Far);
 
             if (baseShader) {
