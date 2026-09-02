@@ -40,6 +40,32 @@ void RendererSystem::Update(Scene& scene) {
 
     glm::mat4 viewProjection = projectionMatrix * viewMatrix;
 
+    scene.Each<AmbientComponent>(
+        [this, & viewMatrix, &projectionMatrix](Entity entity, AmbientComponent& ambient) {
+            const SkyComponent& sky = ambient.Sky;
+
+            Shader* skyShader = Assets::Shaders.Has(sky.ShaderID) ? Assets::Shaders.Get(sky.ShaderID) : nullptr;
+            Texture* hdriTex = Assets::Textures.Has(sky.SkyTextureID) ? Assets::Textures.Get(sky.SkyTextureID) : nullptr;
+
+            if (!skyShader || !hdriTex) return;
+
+            skyShader->Bind();
+
+            skyShader->SetMat4("u_InverseProjection", glm::inverse(projectionMatrix));
+
+            glm::mat4 viewRotOnly = glm::mat4(glm::mat3(viewMatrix));
+            skyShader->SetMat4("u_InverseView", glm::inverse(viewRotOnly));
+
+            skyShader->SetFloat("u_Exposure", sky.Exposure);
+            skyShader->SetInt("u_SkyTexture", 0);
+
+            hdriTex->Bind(0);
+            m_Context->SetDepthFunc(DEPTH_LEQUAL);
+            m_Context->DrawArrays(3);
+            m_Context->SetDepthFunc(DEPTH_LESS);
+        }
+    );
+
     scene.Each<MeshComponent, TransformComponent>(
         [this, &scene, &viewProjection, &cameraPos](Entity entity, MeshComponent& mesh, TransformComponent& transform) {
             Mesh* model = Assets::Meshes.Get(mesh.MeshID);

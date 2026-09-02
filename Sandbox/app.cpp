@@ -33,7 +33,7 @@ void Sandbox::OnStart() {
     Context.scene->AddComponent<CameraComponent>(camera); // Use the default configs
 
     Context.scene->AddComponent<TransformComponent>(ambient);
-    Context.scene->AddComponent<AmbientComponent>(ambient);
+    Context.scene->AddComponent<AmbientComponent>(ambient).Sky.SkyTextureID = "SkyTexture";
 
     Context.scene->AddComponent<TransformComponent>(cube);
     Context.scene->AddComponent<MeshComponent>(cube).MeshID = "Cube";

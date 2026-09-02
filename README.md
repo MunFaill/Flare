@@ -4,6 +4,7 @@
 Inspired on the Urho3D engine and Hazel engine
 
 [Default texture by Kenney](https://kenney.nl/assets/prototype-textures)
+[Sandbox sky textyre by AmbientCG](https://ambientcg.com/view?id=DayEnvironmentHDRI112)
 
 ### Features and vendor
 
@@ -35,12 +36,12 @@ Unix-like systems
 See [Sandbox](Sandbox) for use examples.
 
 ### Images from Sandbox application:
+![Sky](Docs/FlareSkyScreenShot.png)
 ![Multi Lights](Docs/MultiLightSpinCube.png)
 ![GLTF Rendering](Docs/FlareScreenShot.png)
 
 ### What to come:
-- [ ] Forward+ rendering
 - [x] Better material (With multiple texture chanels for object)
-- [ ] Skybox
+- [x] Skybox
 - [x] Fix camera stretch
-- [ ] Basic UI
+- [ ] Input system

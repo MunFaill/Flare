@@ -1,5 +1,6 @@
 #include "Renderer/Device/GL/GLContext.h"
 #include "Platform/Windowing/Window.h"
+#include "Renderer/Device/DeviceContext.h"
 
 #include <print>
 #define GLAD_GL_IMPLEMENTATION
@@ -35,13 +36,27 @@ void GLContext::Initialize(Window& window) {
 
     glfwSetFramebufferSizeCallback(window.Handle, framebuffer_size_callback);
 
+    glDepthFunc(GL_LESS);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     std::println("GL context initialized");
+}
+
+void GLContext::DrawArrays(int x) {
+    glDrawArrays(GL_TRIANGLES, 0, x);
 }
 
 void GLContext::DrawCall(uint32_t IndexCount) {
     glDrawElements(GL_TRIANGLES, IndexCount, GL_UNSIGNED_INT, nullptr);
 }
+
+void GLContext::SetDepthFunc(uint32_t func) {
+    glDepthFunc(func);
+}
+
+void GLContext::SetBlendFuncs(uint32_t func1, uint32_t func2) {
+    glBlendFunc(func1, func2);
+}
+
 
 void GLContext::DepthTest(bool State) {
     if (State) glEnable(GL_DEPTH_TEST);

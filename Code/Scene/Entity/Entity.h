@@ -19,6 +19,7 @@ struct TransformComponent {
     glm::mat4 GetTransform() const;
 };
 
+// ---Unexposed components (Used by other components)------
 struct MaterialComponent {
     std::string ShaderID = "Base";
     std::string DiffuseID = "DefaultDiffuse";
@@ -27,6 +28,13 @@ struct MaterialComponent {
     float SpecularPower = 32.0f;
 };
 
+struct SkyComponent {
+    std::string ShaderID = "Sky";
+    std::string SkyTextureID = "";
+    float Exposure = 1.0f;
+};
+// --------------------------------------------------------
+
 struct MeshComponent {
     std::string MeshID = "";
     MaterialComponent Material = {};
@@ -34,6 +42,7 @@ struct MeshComponent {
 
 struct AmbientComponent {
     glm::vec4 AmbientColor{1.0f};
+    SkyComponent Sky = {};
 };
 
 struct DirectionalLightComponent {
