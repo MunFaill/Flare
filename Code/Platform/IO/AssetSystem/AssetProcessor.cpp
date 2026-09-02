@@ -21,6 +21,33 @@ std::string GetAssetName(const std::string& Path) {
     return std::filesystem::path(Path).stem().string();
 }
 
+std::string ResolveShaderIncludes(const std::string& filePath) {
+    std::string source = File::Read(filePath);
+    std::stringstream ss(source);
+    std::stringstream result;
+    std::string line;
+
+    std::string directory = std::filesystem::path(filePath).parent_path().string();
+
+    while (std::getline(ss, line)) {
+        if (line.rfind("#include", 0) == 0) {
+            std::size_t firstQuote = line.find('"');
+            std::size_t lastQuote = line.rfind('"');
+
+            if (firstQuote != std::string::npos && lastQuote != std::string::npos && firstQuote < lastQuote) {
+                std::string includeFileName = line.substr(firstQuote + 1, lastQuote - firstQuote - 1);
+                std::string fullIncludePath = directory + "/" + includeFileName;
+
+                result << ResolveShaderIncludes(fullIncludePath) << "\n";
+            }
+        } else {
+            result << line << "\n";
+        }
+    }
+
+    return result.str();
+}
+
 void AssetProcessor::Process(const std::vector<std::string>& Files) {
     for (const std::string& FilePath : Files) {
         if (FilePath.ends_with(".shader")) {
@@ -38,7 +65,7 @@ void AssetProcessor::Process(const std::vector<std::string>& Files) {
 }
 
 void AssetProcessor::ProcessShaders(const std::string& File) {
-    std::string Source = File::Read(File);
+    std::string Source = ResolveShaderIncludes(File);
 
     std::string VertexSource;
     std::string FragmentSource;

@@ -25,7 +25,9 @@ void main() {
 
 #[FRAGMENT]
 #version 460 core
-#define MAX_LIGHTS 8
+
+#include "Light/Lighting.glsl"
+#include "Material/Material.glsl"
 
 out vec4 FragmentColor;
 
@@ -34,130 +36,33 @@ in vec3 vNormal;
 in vec2 vTexCoord;
 in vec4 vColor;
 
-struct Envoironment {
+struct Environment {
     vec4 AmbientColor;
-};
-
-struct Material {
-    sampler2D Diffuse;
-    sampler2D Specular;
-    vec4 Albedo;
-    float SpecularPower;
-};
-
-struct DirectionalLight {
-    vec3 LightDirection;
-    vec3 LightColor;
-    vec3 Diffuse;
-    vec3 Specular;
-};
-
-struct PointLight {
-    vec3 LightPosition;
-    vec3 LightColor;
-    vec3 Diffuse;
-    vec3 Specular;
-    float Constant;
-    float Linear;
-    float Quadratic;
 };
 
 uniform PointLight pointlights[MAX_LIGHTS];
 uniform int u_NumPointLights;
 
-uniform Envoironment environment;
+uniform Environment environment;
 uniform Material material;
 uniform DirectionalLight dirlight;
-uniform PointLight pointlight;
 uniform vec3 viewPos;
-
-vec4 GetBaseColor() {
-    vec4 texColor = texture(material.Diffuse, vTexCoord);
-    
-    if (texColor.a == 0.0) {
-        texColor = vec4(1.0);
-    }
-
-    vec4 albedo = material.Albedo.a > 0.0 ? material.Albedo : vec4(1.0);
-    vec4 vertexCol = vColor.a > 0.0 ? vColor : vec4(1.0);
-
-    return texColor * albedo * vertexCol;
-}
-
-vec4 GetSpecularColor() {
-    vec4 texColor = texture(material.Specular, vTexCoord);
-    
-    if (texColor.a == 0.0) {
-        texColor = vec4(1.0);
-    }
-
-    return texColor;
-}
-
-vec3 DirLightFunc(DirectionalLight light, vec3 normal, vec3 viewDir, vec3 baseColor, vec3 specColor) {
-    if (length(light.LightColor) <= 0.001 || length(light.LightDirection) <= 0.001) {
-        return vec3(0.0);
-    }
-
-    vec3 lightDir = normalize(-light.LightDirection);
-
-    float diff = max(dot(normal, lightDir), 0.0);
-    vec3 diffuse = light.Diffuse * diff * baseColor;
-    
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float specPower = max(material.SpecularPower, 1.0);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), specPower);
-
-    vec3 specular = light.Specular * spec * specColor;
-
-    return (diffuse + specular) * light.LightColor;
-}
-
-vec3 PointLightFunc(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 baseColor, vec3 specColor) {
-    if (length(light.LightColor) <= 0.001) {
-        return vec3(0.0);
-    }
-
-    vec3 lightDir = normalize(light.LightPosition - fragPos);
-    float diff = max(dot(normal, lightDir), 0.0);
-    vec3 reflectDir = reflect(-lightDir, normal);
-
-    float specPower = max(material.SpecularPower, 1.0);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), specPower);
-
-    float distance = length(light.LightPosition - fragPos);
-    
-    float denom = light.Constant + light.Linear * distance + light.Quadratic * (distance * distance);
-    float attenuation = denom > 0.0 ? (1.0 / denom) : 0.0;
-
-    vec3 diffuse = light.Diffuse * diff * baseColor;
-    vec3 specular = light.Specular * spec * specColor;
-
-    diffuse *= attenuation;
-    specular *= attenuation;
-
-    return (diffuse + specular) * light.LightColor;
-}
 
 void main() {
     vec3 normal = normalize(vNormal);
     vec3 viewDir = normalize(viewPos - vPosition);
     
-    vec4 baseColor = GetBaseColor();
-    vec4 specColor = GetSpecularColor();
+    vec4 baseColor = GetBaseColor(material, vTexCoord, vColor);
+    vec4 specColor = GetSpecularColor(material, vTexCoord);
 
-    vec3 ambientContrib = environment.AmbientColor.rgb;
-    if (length(ambientContrib) <= 0.001) {
-        ambientContrib = vec3(0.05);
-    } else {
-        ambientContrib = ambientContrib * 0.1;
-    }
+    vec3 ambientContrib = length(environment.AmbientColor.rgb) <= 0.001 ? vec3(0.05) : environment.AmbientColor.rgb * 0.1;
+
     vec3 result = ambientContrib * baseColor.rgb;
 
-    result += DirLightFunc(dirlight, normal, viewDir, baseColor.rgb, specColor.rgb);
+    result += DirLightFunc(dirlight, normal, viewDir, baseColor.rgb, specColor.rgb, material.SpecularPower);
 
     for (int i = 0; i < u_NumPointLights; i++) {
-        result += PointLightFunc(pointlights[i], normal, vPosition, viewDir, baseColor.rgb, specColor.rgb);
+        result += PointLightFunc(pointlights[i], normal, vPosition, viewDir, baseColor.rgb, specColor.rgb, material.SpecularPower);
     }
 
     FragmentColor = vec4(result, baseColor.a);

@@ -22,105 +22,81 @@ void RendererSystem::Init(Window& window) {
 void RendererSystem::Update(Scene& scene) {
     m_Context->Clear({0.0f, 0.0f, 0.0f, 1.0f});
 
-    Shader* baseShader = Assets::Shaders.Has("Base") ? Assets::Shaders.Get("Base") : nullptr;
-
-    glm::mat4 viewMatrix = glm::mat4(1.0f);
-    glm::mat4 projectionMatrix = glm::mat4(1.0f);
+    glm::mat4 viewMatrix(1.0f);
+    glm::mat4 projectionMatrix(1.0f);
+    glm::vec3 cameraPos(0.0f);
 
     scene.Each<TransformComponent, CameraComponent>(
         [&](Entity entity, TransformComponent& transform, CameraComponent& camera) {
             if (!camera.Current) return;
 
+            cameraPos = transform.Position;
             viewMatrix = glm::inverse(transform.GetTransform());
 
-            float width = static_cast<float>(m_Window->Width);
-            float height = static_cast<float>(m_Window->Height);
-            float aspectRatio = width / height;
-            
+            float aspectRatio = static_cast<float>(m_Window->Width) / static_cast<float>(m_Window->Height);
             projectionMatrix = glm::perspective(glm::radians(camera.Fov), aspectRatio, camera.Near, camera.Far);
-
-            if (baseShader) {
-                baseShader->SetVec3("viewPos", transform.Position);
-            }
         }
     );
 
     glm::mat4 viewProjection = projectionMatrix * viewMatrix;
 
-    if (baseShader) {
-        baseShader->Bind();
-        baseShader->SetMat4("u_ViewProjection", viewProjection);
-    }
-
-    scene.Each<AmbientComponent>(
-        [&](Entity entity, AmbientComponent& ambient) {
-            if (baseShader) {
-                baseShader->SetVec4("environment.AmbientColor", ambient.AmbientColor);
-            }
-        }
-    );
-
-    scene.Each<DirectionalLightComponent, TransformComponent>(
-        [&](Entity entity, DirectionalLightComponent& light, TransformComponent& transform) {
-            if (baseShader) {
-                baseShader->SetVec3("dirlight.LightDirection", transform.Rotation);
-                baseShader->SetVec3("dirlight.LightColor", light.LightColor);
-                baseShader->SetVec3("dirlight.Diffuse", light.Diffuse);
-                baseShader->SetVec3("dirlight.Specular", light.Specular);
-            }
-        }
-    );
-
-    int pointLightCount = 0;
-    const int MAX_POINT_LIGHTS = 8;
-
-    scene.Each<PointLightComponent, TransformComponent>(
-        [&](Entity entity, PointLightComponent& light, TransformComponent& transform) {
-            if (baseShader && pointLightCount < MAX_POINT_LIGHTS) {
-                std::string baseName = "pointlights[" + std::to_string(pointLightCount) + "].";
-
-                baseShader->SetVec3(baseName + "LightPosition", transform.Position);
-                baseShader->SetVec3(baseName + "LightColor", light.LightColor);
-                baseShader->SetVec3(baseName + "Diffuse", light.Diffuse);
-                baseShader->SetVec3(baseName + "Specular", light.Specular);
-                baseShader->SetFloat(baseName + "Constant", light.Constant);
-                baseShader->SetFloat(baseName + "Linear", light.Linear);
-                baseShader->SetFloat(baseName + "Quadratic", light.Quadratic);
-
-                pointLightCount++;
-            }
-        }
-    );
-
-    if (baseShader) {
-        baseShader->SetInt("u_NumPointLights", pointLightCount);
-    }
-
     scene.Each<MeshComponent, TransformComponent>(
-        [this, &scene, baseShader](Entity entity, MeshComponent& mesh, TransformComponent& transform) {
+        [this, &scene, &viewProjection, &cameraPos](Entity entity, MeshComponent& mesh, TransformComponent& transform) {
             Mesh* model = Assets::Meshes.Get(mesh.MeshID);
             MaterialComponent* mat = &mesh.Material;
             Shader* shader = Assets::Shaders.Get(mat->ShaderID);
 
-            if (!model) return;
+            if (!model || !shader) return;
 
-            if (shader) {
-                shader->SetInt("material.Diffuse", 0);
-                shader->SetInt("material.Specular", 1);
-                
-                shader->SetFloat("material.SpecularPower", mat->SpecularPower);
-                shader->SetVec4("material.Albedo", mat->Albedo);
-                if (Assets::Textures.Has(mat->DiffuseID)) {
-                    Assets::Textures.Get(mat->DiffuseID)->Bind(0);
+            shader->Bind();
+
+            shader->SetMat4("u_ViewProjection", viewProjection);
+            shader->SetMat4("u_Model", transform.GetTransform());
+            shader->SetVec3("viewPos", cameraPos);
+
+            scene.Each<AmbientComponent>([&](Entity e, AmbientComponent& ambient) {
+                shader->SetVec4("environment.AmbientColor", ambient.AmbientColor);
+            });
+
+            scene.Each<DirectionalLightComponent, TransformComponent>(
+                [&](Entity e, DirectionalLightComponent& light, TransformComponent& lightTransform) {
+                    shader->SetVec3("dirlight.LightDirection", lightTransform.Rotation);
+                    shader->SetVec3("dirlight.LightColor", light.LightColor);
+                    shader->SetVec3("dirlight.Diffuse", light.Diffuse);
+                    shader->SetVec3("dirlight.Specular", light.Specular);
                 }
+            );
 
-                if (Assets::Textures.Has(mat->SpecularID)) {
-                    Assets::Textures.Get(mat->SpecularID)->Bind(1);
-                } else if (Assets::Textures.Has("Default")) {
-                    Assets::Textures.Get("Default")->Bind(1);
+            int pointLightCount = 0;
+            scene.Each<PointLightComponent, TransformComponent>(
+                [&](Entity e, PointLightComponent& light, TransformComponent& lightTransform) {
+                    if (pointLightCount < 8) {
+                        std::string baseName = "pointlights[" + std::to_string(pointLightCount) + "].";
+                        shader->SetVec3(baseName + "LightPosition", lightTransform.Position);
+                        shader->SetVec3(baseName + "LightColor", light.LightColor);
+                        shader->SetVec3(baseName + "Diffuse", light.Diffuse);
+                        shader->SetVec3(baseName + "Specular", light.Specular);
+                        shader->SetFloat(baseName + "Constant", light.Constant);
+                        shader->SetFloat(baseName + "Linear", light.Linear);
+                        shader->SetFloat(baseName + "Quadratic", light.Quadratic);
+                        pointLightCount++;
+                    }
                 }
+            );
+            shader->SetInt("u_NumPointLights", pointLightCount);
 
-                shader->SetMat4("u_Model", transform.GetTransform());
+            shader->SetInt("material.Diffuse", 0);
+            shader->SetInt("material.Specular", 1);
+            shader->SetFloat("material.SpecularPower", mat->SpecularPower);
+            shader->SetVec4("material.Albedo", mat->Albedo);
+
+            if (Assets::Textures.Has(mat->DiffuseID)) {
+                Assets::Textures.Get(mat->DiffuseID)->Bind(0);
+            }
+            if (Assets::Textures.Has(mat->SpecularID)) {
+                Assets::Textures.Get(mat->SpecularID)->Bind(1);
+            } else if (Assets::Textures.Has("Default")) {
+                Assets::Textures.Get("Default")->Bind(1);
             }
 
             model->Bind();
