@@ -20,6 +20,7 @@ struct TransformComponent {
 };
 
 struct MaterialComponent {
+    std::string ShaderID = "Base";
     std::string DiffuseID = "DefaultDiffuse";
     std::string SpecularID = "DefaultSpecular";
     glm::vec4 Albedo{1.0f};

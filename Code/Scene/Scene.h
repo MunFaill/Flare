@@ -58,7 +58,6 @@ struct Scene{
             ComponentStorage<MeshComponent>,
             ComponentStorage<CameraComponent>,
             ComponentStorage<AmbientComponent>,
-            ComponentStorage<MaterialComponent>,
             ComponentStorage<DirectionalLightComponent>,
             ComponentStorage<PointLightComponent>
         > m_Components;

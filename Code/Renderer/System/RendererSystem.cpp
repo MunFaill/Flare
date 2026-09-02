@@ -99,16 +99,17 @@ void RendererSystem::Update(Scene& scene) {
     scene.Each<MeshComponent, TransformComponent>(
         [this, &scene, baseShader](Entity entity, MeshComponent& mesh, TransformComponent& transform) {
             Mesh* model = Assets::Meshes.Get(mesh.MeshID);
+            MaterialComponent* mat = &mesh.Material;
+            Shader* shader = Assets::Shaders.Get(mat->ShaderID);
+
             if (!model) return;
 
-            if (baseShader) {
-                baseShader->SetInt("material.Diffuse", 0);
-                baseShader->SetInt("material.Specular", 1);
-
-                MaterialComponent* mat = &mesh.Material;
+            if (shader) {
+                shader->SetInt("material.Diffuse", 0);
+                shader->SetInt("material.Specular", 1);
                 
-                baseShader->SetFloat("material.SpecularPower", mat->SpecularPower);
-                baseShader->SetVec4("material.Albedo", mat->Albedo);
+                shader->SetFloat("material.SpecularPower", mat->SpecularPower);
+                shader->SetVec4("material.Albedo", mat->Albedo);
                 if (Assets::Textures.Has(mat->DiffuseID)) {
                     Assets::Textures.Get(mat->DiffuseID)->Bind(0);
                 }
@@ -119,7 +120,7 @@ void RendererSystem::Update(Scene& scene) {
                     Assets::Textures.Get("Default")->Bind(1);
                 }
 
-                baseShader->SetMat4("u_Model", transform.GetTransform());
+                shader->SetMat4("u_Model", transform.GetTransform());
             }
 
             model->Bind();
