@@ -39,9 +39,3 @@ See [Sandbox](Sandbox) for use examples.
 ![Sky](Docs/FlareSkyScreenShot.png)
 ![Multi Lights](Docs/MultiLightSpinCube.png)
 ![GLTF Rendering](Docs/FlareScreenShot.png)
-
-### What to come:
-- [x] Better material (With multiple texture chanels for object)
-- [x] Skybox
-- [x] Fix camera stretch
-- [ ] Input system
