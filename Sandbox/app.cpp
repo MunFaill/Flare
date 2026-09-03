@@ -1,62 +1,48 @@
 #include "app.h"
 
-static Entity camera;
-static Entity cube;
-static Entity sun;
-static Entity ambient;
-static Entity light;
-static Entity light2;
-static Entity light3;
+// Probably insecure!
+static Entity* camera;
+static Entity* cube;
+static Entity* sun;
+static Entity* ambient;
+static Entity* light;
+static Entity* light2;
+static Entity* light3;
 
-void Sandbox::OnSetUp() {
-    // Called once after the creation of the systems and before their execution.
-    Context.window->Title = "Sandbox";
+void App::OnSetup() {
+    Modules->WindowModule->Title = "Sandbox";
 }
 
-void Sandbox::OnStart() {
-    // Called once after the creation and execution of the systems.
+void App::OnStart() {
+    std::vector<std::string> FilesContaienr = Modules->FileSystemModule->ScanFolder("Sandbox/Assets"); // Scan for files (Assets like images, shaders and models)
+    Modules->AssetProcessorModule->Process(FilesContaienr);
 
-    std::vector<std::string> FilesContainer = Context.file->Scan("Sandbox/Assets");
-    Context.assetProcessor->Process(FilesContainer);
+    camera = Modules->SceneModule->CreateEntity("Camera");
+    cube = Modules->SceneModule->CreateEntity("Cube");
+    sun = Modules->SceneModule->CreateEntity("Sun");
+    ambient = Modules->SceneModule->CreateEntity("Ambient");
+    light = Modules->SceneModule->CreateEntity("PointLight");
 
-    // Create entities
-    camera = Context.scene->CreateEntity();
-    ambient = Context.scene->CreateEntity();
-    cube = Context.scene->CreateEntity();
-    sun = Context.scene->CreateEntity();
-    light = Context.scene->CreateEntity();
-    light2 = Context.scene->CreateEntity();
-    light3 = Context.scene->CreateEntity();
+    camera->AddComponent<TransformComponent>().Position.z = 5.0f; // Customize parameters
+    camera->AddComponent<CameraComponent>(); // Default parameters
 
-    // Add component to entities
-    Context.scene->AddComponent<TransformComponent>(camera).Position = {0.0f, 0.0f, 5.0f}; // Set custom configs
-    Context.scene->AddComponent<CameraComponent>(camera); // Use the default configs
+    cube->AddComponent<TransformComponent>();
+    cube->AddComponent<MeshComponent>().MeshID = "Cube";
 
-    Context.scene->AddComponent<TransformComponent>(ambient);
-    Context.scene->AddComponent<AmbientComponent>(ambient).Sky.SkyTextureID = "SkyTexture";
+    sun->AddComponent<TransformComponent>().Rotation = {-5.0f, -5.0f, -5.0f};
+    sun->AddComponent<DirectionalLightComponent>();
 
-    Context.scene->AddComponent<TransformComponent>(cube);
-    Context.scene->AddComponent<MeshComponent>(cube).MeshID = "Cube";
-    
-    Context.scene->AddComponent<TransformComponent>(sun).Rotation = {-0.2f, -1.0f, -0.3f};
-    Context.scene->AddComponent<DirectionalLightComponent>(sun).LightColor = {1.0f, 1.0f, 1.0f};
+    ambient->AddComponent<AmbientComponent>().TextureID = "SkyTexture";
 
-    Context.scene->AddComponent<TransformComponent>(light).Position = {1.0f, -1.0f, 2.0f};
-    Context.scene->AddComponent<PointLightComponent>(light).LightColor = {1.0f, 0.0f, 0.0f};
-
-    Context.scene->AddComponent<TransformComponent>(light2).Position = {-1.0f, -2.0f, 2.0f};
-    Context.scene->AddComponent<PointLightComponent>(light2).LightColor = {0.0f, 1.0f, 0.0f};
-
-    Context.scene->AddComponent<TransformComponent>(light3).Position = {-1.0f, 0.0f, 2.0f};
-    Context.scene->AddComponent<PointLightComponent>(light3).LightColor = {1.0f, 0.0f, 1.0f};
+    light->AddComponent<TransformComponent>().Position = {1.0f, -1.0f, 2.0f};
+    light->AddComponent<PointLightComponent>().LightColor = {1.0f, 0.0f, 0.0f};
 }
 
-void Sandbox::OnUpdate() {
-    // Update cube rotation every frame
-    Context.scene->GetComponent<TransformComponent>(cube)->Rotation.x += 50 * Context.time->DeltaTime;
-    Context.scene->GetComponent<TransformComponent>(cube)->Rotation.z += 50 * Context.time->DeltaTime;
+void App::OnUpdate(float delta) {
+    cube->GetComponent<TransformComponent>()->Rotation.x += 50.0f * delta;
+    cube->GetComponent<TransformComponent>()->Rotation.z += 50.0f * delta;
 }
 
-void Sandbox::OnStop() {
-    // Called once before the destruction of the systems
+void App::OnShutdown() {
+
 }

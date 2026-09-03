@@ -9,6 +9,8 @@ struct Window {
     void Init();
     void Shutdown();
     void SwapBuffers();
+    void Resizable(bool state);
+    void VSync(bool state);
     bool CloseEvent();
     std::string Title = "Untitled";
     uint16_t Width = 1280, Height = 720;

@@ -29,7 +29,7 @@ std::string File::Read(const std::string& Path) {
     return "";
 }
 
-std::vector<std::string> File::Scan(const std::string& Path) {
+std::vector<std::string> File::ScanFolder(const std::string& Path) {
     std::vector<std::string> FilesInPath;
     std::filesystem::path FolderPath = Path;
 

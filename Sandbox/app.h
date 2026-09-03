@@ -1,12 +1,12 @@
 #include <Flare.h>
 
-class Sandbox : public Application {
+class App : public Application {
     public:
-        Sandbox() = default;
-        ~Sandbox() override = default;
+        App() = default;
+        ~App() override = default;
 
-        void OnSetUp() override;
+        void OnSetup() override;
         void OnStart() override;
-        void OnUpdate() override;
-        void OnStop() override;
+        void OnUpdate(float delta) override;
+        void OnShutdown() override;
 };

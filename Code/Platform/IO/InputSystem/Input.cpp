@@ -1,7 +1,10 @@
 #include "Platform/IO/InputSystem/Input.h"
+#include "Platform/Windowing/Window.h"
 
-void Input::Update(GLFWwindow* window) {
-    m_WindowHandle = window;
+#include <GLFW/glfw3.h>
+
+void Input::Update(Window& window) {
+    m_WindowHandle = window.Handle;
 
     m_PreviousState = m_CurrentState;
 

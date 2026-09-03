@@ -22,6 +22,20 @@ void Window::SwapBuffers() {
     glfwPollEvents();
 }
 
+void Window::Resizable(bool state) {
+    if (Handle) {
+        if (state) glfwSetWindowAttrib(Handle, GLFW_RESIZABLE, GLFW_TRUE);
+        else glfwSetWindowAttrib(Handle, GLFW_RESIZABLE, GLFW_FALSE);
+    }
+}
+
+void Window::VSync(bool state) {
+    if (Handle) {
+        if (state) glfwSwapInterval(1);
+        else glfwSwapInterval(0);
+    }
+}
+
 bool Window::CloseEvent() {
     if (glfwWindowShouldClose(Handle)) return true;
     return false;

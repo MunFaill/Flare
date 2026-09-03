@@ -1,61 +1,58 @@
 #include "Core/Application.h"
+#include "Math/Time.h"
+#include "Platform/IO/AssetSystem/Assets.h"
 #include "Platform/Windowing/WindowBackend.h"
+#include "Renderer/System/RendererPipeline.h"
 
-#include <print>
+static Time _time;
+static RendererSystem Pipeline;
 
 void Application::Run() {
-    std::println("Application initializing");
+    // Setup and create the modules
+    Modules = std::make_unique<EngineModules>();
+    _time.Init();
 
+    Modules->WindowModule = std::make_unique<Window>();
+    Modules->InputModule = std::make_unique<Input>();
+    Modules->AssetProcessorModule = std::make_unique<AssetProcessor>();
+    Modules->FileSystemModule = std::make_unique<File>();
+    Modules->SceneModule = std::make_unique<Scene>();
+
+    OnSetup(); // OnSetup is called once after creation and before initialization
+    // Initialize modules
     WindowBackend::Init();
-    
-    Context.window = std::make_unique<Window>();
-    Context.time = std::make_unique<Time>();
-    Context.file = std::make_unique<File>();
-    Context.assets = std::make_unique<Assets>();
-    Context.input = std::make_unique<Input>();
-    Context.assetProcessor = std::make_unique<AssetProcessor>();
-    Context.scene = std::make_unique<Scene>();
-    Context.renderer = std::make_unique<RendererSystem>();
+    Modules->WindowModule->Init();
+    Pipeline.Init(*Modules->WindowModule);
 
-    OnSetUp();
+    OnStart(); // OnStart is called once after creation and initialization
 
-    Context.window->Init();
-    Context.time->InitTime();
-    Context.renderer->Init(*Context.window);
+    while (Running) { // Called every frame
+        OnUpdate(_time.Delta);
+        if (Modules->WindowModule->CloseEvent()) Running = false;
+        _time.Update();
+        Pipeline.Update(*Modules->SceneModule);
 
-    OnStart();
-
-    std::println("Application loop");
-    // After-start setup
-    while (Running) {
-        if (Context.window->CloseEvent()) Running = false;
-        Context.input->Update(Context.window->Handle);
-        Context.time->CalculateTime();
-        Context.renderer->Update(*Context.scene);
-
-        OnUpdate();
-
-        Context.window->SwapBuffers();
+        Modules->InputModule->Update(*Modules->WindowModule);
+        Modules->WindowModule->SwapBuffers();
     }
 
-    std::println("Application shtudown");
-    OnStop();
-    // Shutdown here
+    OnShutdown();
 
-    Context.assets->Shaders.Clear();
-    Context.assets->Textures.Clear();
-    Context.assets->Meshes.Clear();
+    Assets::Textures.Clear();
+    Assets::Shaders.Clear();
+    Assets::Meshes.Clear();
 
-    Context.renderer->Shutdown();
-    Context.window->Shutdown();
+    Modules->SceneModule.reset();
+    Modules->InputModule.reset();
+    Modules->AssetProcessorModule.reset();
+    Modules->InputModule.reset();
+
+    Pipeline.Shutdown();
+
+    Modules->WindowModule->Shutdown();
+    Modules->WindowModule.reset();
+
     WindowBackend::Shutdown();
 
-    Context.window.reset();
-    Context.time.reset();
-    Context.file.reset();
-    Context.assets.reset();
-    Context.input.reset();
-    Context.assetProcessor.reset();
-    Context.scene.reset();
-    Context.renderer.reset();
+    Modules.reset();
 }

@@ -2,28 +2,24 @@
 
 #include <chrono>
 
-// Helpers
-
 typedef std::chrono::time_point<std::chrono::steady_clock> TimePoint;
 
-static TimePoint LastTime;
+static TimePoint Last;
 
 TimePoint Now() {
     return std::chrono::steady_clock::now();
 }
 
-// Code
-
-void Time::InitTime() {
-    LastTime = Now();
+void Time::Init() {
+    Last = Now();
 }
 
-void Time::CalculateTime() {
-    TimePoint CurrentTime = Now();
+void Time::Update() {
+    TimePoint Current = Now();
 
-    std::chrono::duration<float> elapsed = CurrentTime - LastTime;
+    std::chrono::duration<float> Elapsed = Current - Last;
 
-    DeltaTime = elapsed.count();
+    Delta = Elapsed.count();
 
-    LastTime = CurrentTime;
+    Last = Current;
 }

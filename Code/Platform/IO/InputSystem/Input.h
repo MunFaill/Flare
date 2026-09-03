@@ -3,11 +3,13 @@
 #include "Platform/IO/InputSystem/Keys.h"
 
 #include <unordered_map>
-#include <GLFW/glfw3.h>
+
+class GLFWwindow;
+class Window;
 
 class Input {
 public:
-    void Update(GLFWwindow* window);
+    void Update(Window& window);
 
     bool KeyPressed(Key key);
     bool KeyJustPressed(Key key);

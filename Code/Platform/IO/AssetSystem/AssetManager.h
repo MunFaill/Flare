@@ -5,9 +5,6 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
-#include <vector>
-
-#include <Renderer/Device/Device.h>
 
 template<typename T>
 struct AssetManager {
@@ -35,17 +32,4 @@ struct AssetManager {
 
     private:
         std::unordered_map<std::string, std::unique_ptr<T>> m_Map;
-};
-
-struct Assets {
-    inline static AssetManager<Shader> Shaders;
-    inline static AssetManager<Texture> Textures;
-    inline static AssetManager<Mesh> Meshes;
-};
-
-struct AssetProcessor {
-    void Process(const std::vector<std::string>& Files);
-    void ProcessImages(const std::string& File);
-    void ProcessShaders(const std::string& File);
-    void ProcessMeshes(const std::string& File);
 };

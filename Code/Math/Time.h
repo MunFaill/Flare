@@ -1,7 +1,7 @@
 #pragma once
 
 struct Time {
-    float DeltaTime;
-    void InitTime();
-    void CalculateTime();
+    float Delta;
+    void Init();
+    void Update();
 };

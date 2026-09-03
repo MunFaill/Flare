@@ -1,4 +1,5 @@
-#include "Platform/IO/AssetSystem/Asset.h"
+#include "Platform/IO/AssetSystem/AssetProcessor.h"
+#include "Platform/IO/AssetSystem/Assets.h"
 #include "Platform/IO/FileSystem/File.h"
 
 #include <cstdint>
