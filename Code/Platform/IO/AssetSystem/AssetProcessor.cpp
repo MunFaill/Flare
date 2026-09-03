@@ -182,6 +182,7 @@ void AssetProcessor::ProcessMeshes(const std::string& File) {
                 else if (attr.type == cgltf_attribute_type_texcoord) {
                     for (cgltf_size i = 0; i < numVertices; ++i) {
                         cgltf_accessor_read_float(accessor, i, &vertices[baseIndex + i].TexCoord.x, 2);
+                        vertices[baseIndex + i].TexCoord.y = 1.0f - vertices[baseIndex + i].TexCoord.y;
                     }
                 } 
                 
