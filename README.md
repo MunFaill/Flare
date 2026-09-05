@@ -3,7 +3,6 @@
 ### A toy engine/framework
 Inspired on the Urho3D engine and Hazel engine
 
-[Default texture by Kenney](https://kenney.nl/assets/prototype-textures)
 [Sandbox sky textyre by AmbientCG](https://ambientcg.com/view?id=DayEnvironmentHDRI112)
 
 ### Features and vendor
