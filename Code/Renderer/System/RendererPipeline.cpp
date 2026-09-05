@@ -1,150 +1,130 @@
 #include "Renderer/System/RendererPipeline.h"
+#include "Renderer/Frames/RendererFrame.h"
 
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/trigonometric.hpp>
-#include <Renderer/Device/Device.h>
 
-#include "Platform/IO/AssetSystem/Assets.h"
 #include "Platform/Windowing/Window.h"
-#include "Scene/Entities/Components.h"
-#include "Scene/Entities/Entity.h"
 #include "Scene/Scene.h"
 
 void RendererSystem::Init(Window& window) {
     m_Context = DeviceContext::Create();
     m_Context->Initialize(window);
+
     m_Context->CullFaces(true);
     m_Context->DepthTest(true);
     m_Context->Blend(true);
-    
+
     m_Window = &window;
+
+    m_AmbientPass =
+        std::make_unique<AmbientPass>(*m_Context);
+
+    m_GeometryPass =
+        std::make_unique<GeometryPass>(*m_Context);
 }
 
 void RendererSystem::Update(Scene& scene) {
-    m_Scene = &scene;
+    RenderFrame frame = BuildFrame(scene);
+
     m_Context->Clear({0.0f, 0.0f, 0.0f, 1.0f});
 
-    AmbientPass();
-    GeometryPass();
+    m_AmbientPass->Execute(scene, frame);
+    m_GeometryPass->Execute(scene, frame);
 }
 
 void RendererSystem::Shutdown() {
+    m_GeometryPass.reset();
+    m_AmbientPass.reset();
+
     m_Context.reset();
 }
 
-void RendererSystem::AmbientPass() {
-    glm::mat4 ViewMatrix(1.0f);
-    glm::mat4 ProjectionMatrix(1.0f);
-    glm::vec3 CameraPosition(0.0f);
+RenderFrame RendererSystem::BuildFrame(Scene& scene) {
+    RenderFrame frame;
 
-    for (auto& entity : m_Scene->GetEntities()) {
-        if (!entity->HasComponent<CameraComponent>() || !entity->HasComponent<TransformComponent>()) continue;
-        CameraComponent* Cam = entity->GetComponent<CameraComponent>();
-        TransformComponent* CamTrans = entity->GetComponent<TransformComponent>();
+    float aspect = static_cast<float>(m_Window->Width) / static_cast<float>(m_Window->Height);
 
-        CameraPosition = CamTrans->Position;
-        ViewMatrix = glm::inverse(CamTrans->GetTransform());
-
-        float AspectRatio = static_cast<float>(m_Window->Width) / static_cast<float>(m_Window->Height);
-        ProjectionMatrix = glm::perspective(glm::radians(Cam->FOV), AspectRatio, Cam->Near, Cam->Far);
-    }
-
-    glm::mat4 ViewProjection = ProjectionMatrix * ViewMatrix;
-    if (Assets::Shaders.Has("Base")) {
-        Assets::Shaders.Get("Base")->Bind();
-        Assets::Shaders.Get("Base")->SetMat4("u_ViewProjection", ViewProjection);
-        Assets::Shaders.Get("Base")->SetVec3("viewPos", CameraPosition);
-    }
-
-    for (auto& entity : m_Scene->GetEntities()) {
-        if (!entity->HasComponent<AmbientComponent>()) continue;
-        AmbientComponent* Ambient = entity->GetComponent<AmbientComponent>();
-        Shader* SkyShader = Assets::Shaders.Get(Ambient->ShaderID);
-        Texture* HDRITexture = Assets::Textures.Get(Ambient->TextureID);
-
-        if (!SkyShader || !HDRITexture) continue;
-
-        SkyShader->Bind();
-        SkyShader->SetMat4("u_InverseProjection", glm::inverse(ProjectionMatrix));
-
-        glm::mat4 viewRotOnly = glm::mat4(glm::mat3(ViewMatrix));
-
-        SkyShader->SetMat4("u_InverseView", glm::inverse(viewRotOnly));
-        SkyShader->SetFloat("u_Exposure", Ambient->Exposure);
-        SkyShader->SetInt("u_SkyTexture", 0);
-
-        HDRITexture->Bind(0);
-
-        m_Context->SetDepthFunc(DEPTH_LEQUAL);
-        m_Context->DrawArrays(3);
-        m_Context->SetDepthFunc(DEPTH_LESS);
-    }
-}
-
-void RendererSystem::GeometryPass() {
-    for (auto& entity : m_Scene->GetEntities()) {
-        if (!entity->HasComponent<TransformComponent>() || !entity->HasComponent<MeshComponent>()) continue;
-
-        MeshComponent* _MeshComponent = entity->GetComponent<MeshComponent>();
-        TransformComponent* Transform = entity->GetComponent<TransformComponent>();
-        Mesh* _Mesh = Assets::Meshes.Get(entity->GetComponent<MeshComponent>()->MeshID);
-        MaterialComponent* mat = &_MeshComponent->Material;
-        Shader* _Shader = Assets::Shaders.Get(mat->ShaderID);
-
-        if (!_Mesh || !_Shader) continue;
-
-        _Shader->Bind();
-
-        _Shader->SetMat4("u_Model", Transform->GetTransform());
-        _Shader->SetVec4("environment.AmbientColor", glm::vec4(1.0f)); // TODO: Use color from Ambient Component
-
-        for (auto& entity : m_Scene->GetEntities()) {
-            if (!entity->HasComponent<TransformComponent>() || !entity->HasComponent<DirectionalLightComponent>()) continue;
-            TransformComponent* LightTransform = entity->GetComponent<TransformComponent>();
-            DirectionalLightComponent* DirLight = entity->GetComponent<DirectionalLightComponent>();
-
-            _Shader->SetVec3("dirlight.LightDirection", LightTransform->Rotation);
-            _Shader->SetVec3("dirlight.LightColor", DirLight->LightColor);
-            _Shader->SetVec3("dirlight.Diffuse", DirLight->Diffuse);
-            _Shader->SetVec3("dirlight.Specular", DirLight->Specular);
+    // Camera
+    for (auto& entity : scene.GetEntities()) {
+        if (!entity->HasComponent<CameraComponent>() ||
+            !entity->HasComponent<TransformComponent>()) {
+            continue;
         }
 
-        int PointLightCount = 0;
-        for (auto& entity : m_Scene->GetEntities()) {
-            if (!entity->HasComponent<TransformComponent>() || !entity->HasComponent<PointLightComponent>()) continue;
-            TransformComponent* LightTransform = entity->GetComponent<TransformComponent>();
-            PointLightComponent* PointLight = entity->GetComponent<PointLightComponent>();
-             if (PointLightCount < 8) {
-                std::string baseName = "pointlights[" + std::to_string(PointLightCount) + "].";
-                _Shader->SetVec3(baseName + "LightPosition", LightTransform->Position);
-                _Shader->SetVec3(baseName + "LightColor", PointLight->LightColor);
-                _Shader->SetVec3(baseName + "Diffuse", PointLight->Diffuse);
-                _Shader->SetVec3(baseName + "Specular", PointLight->Specular);
-                _Shader->SetFloat(baseName + "Constant", PointLight->Constant);
-                _Shader->SetFloat(baseName + "Linear", PointLight->Linear);
-                _Shader->SetFloat(baseName + "Quadratic", PointLight->Quadratic);
-                PointLightCount++;
-            }
-        }
-        _Shader->SetInt("u_NumPointLights", PointLightCount);
+        auto* camera = entity->GetComponent<CameraComponent>();
 
-        _Shader->SetInt("material.Diffuse", 0);
-        _Shader->SetInt("material.Specular", 1);
-        _Shader->SetFloat("material.SpecularPower", mat->SpecularPower);
-        _Shader->SetVec4("material.Albedo", mat->Albedo);
+        glm::mat4 world = entity->GetWorldTransform();
 
-        if (Assets::Textures.Has(mat->DiffuseID)) {
-            Assets::Textures.Get(mat->DiffuseID)->Bind(0);
-        }
+        frame.Camera.Position = glm::vec3(world[3]);
 
-        if (Assets::Textures.Has(mat->SpecularID)) {
-            Assets::Textures.Get(mat->SpecularID)->Bind(1);
-        } else if (Assets::Textures.Has("Default")) {
-            Assets::Textures.Get("Default")->Bind(1);
-        }
+        frame.Camera.View = glm::inverse(world);
 
-        _Mesh->Bind();
+        frame.Camera.Projection = glm::perspective(     glm::radians(camera->FOV), aspect, camera->Near, camera->Far);
 
-        m_Context->DrawCall(_Mesh->GetIndexCount());
+        frame.Camera.ViewProjection = frame.Camera.Projection * frame.Camera.View;
+
+        frame.Camera.FOV = camera->FOV;
+        frame.Camera.Near = camera->Near;
+        frame.Camera.Far = camera->Far;
+
+        frame.HasCamera = true;
+
+        break;
     }
+
+    // Directional Light
+    for (auto& entity : scene.GetEntities()) {
+        if (!entity->HasComponent<DirectionalLightComponent>() ||
+            !entity->HasComponent<TransformComponent>()) {
+            continue;
+        }
+
+        auto* transform = entity->GetComponent<TransformComponent>();
+
+        auto* light = entity->GetComponent<DirectionalLightComponent>();
+
+        frame.DirectionalLight.Direction = transform->Rotation;
+
+        frame.DirectionalLight.Color = light->LightColor;
+
+        frame.DirectionalLight.Diffuse = light->Diffuse;
+
+        frame.DirectionalLight.Specular = light->Specular;
+
+        frame.HasDirectionalLight = true;
+
+        break;
+    }
+
+    // Point Lights
+    for (auto& entity : scene.GetEntities()) {
+        if (!entity->HasComponent<PointLightComponent>() ||
+            !entity->HasComponent<TransformComponent>()) {
+            continue;
+        }
+
+        if (frame.PointLights.size() >= 8)
+            break;
+
+        auto* transform = entity->GetComponent<TransformComponent>();
+
+        auto* light = entity->GetComponent<PointLightComponent>();
+
+        PointLightData data;
+
+        data.Position = glm::vec3(entity->GetWorldTransform()[3]);
+
+        data.Color = light->LightColor;
+        data.Diffuse = light->Diffuse;
+        data.Specular = light->Specular;
+
+        data.Constant = light->Constant;
+        data.Linear = light->Linear;
+        data.Quadratic = light->Quadratic;
+
+        frame.PointLights.push_back(data);
+    }
+
+    return frame;
 }

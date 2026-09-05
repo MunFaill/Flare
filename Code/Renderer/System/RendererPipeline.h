@@ -2,20 +2,28 @@
 
 #include "Renderer/Device/DeviceContext.h"
 
+#include "Renderer/Passes/AmbientPass.h"
+#include "Renderer/Passes/GeometryPass.h"
+
 #include <memory>
 
 struct Window;
 class Scene;
 
-struct RendererSystem {
+class RendererSystem {
+public:
     void Init(Window& window);
     void Update(Scene& scene);
     void Shutdown();
 
-    void AmbientPass();
-    void GeometryPass();
-    private:
-        std::unique_ptr<DeviceContext> m_Context;
-        Scene* m_Scene = nullptr;
-        Window* m_Window = nullptr;
+private:
+    RenderFrame BuildFrame(Scene& scene);
+
+private:
+    std::unique_ptr<DeviceContext> m_Context;
+
+    std::unique_ptr<AmbientPass> m_AmbientPass;
+    std::unique_ptr<GeometryPass> m_GeometryPass;
+
+    Window* m_Window = nullptr;
 };

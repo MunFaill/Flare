@@ -26,3 +26,17 @@ void Entity::RemoveChild(Entity* child) {
     if (child->Parent == this)
         child->Parent = nullptr;
 }
+
+glm::mat4 Entity::GetWorldTransform() {
+    if (!HasComponent<TransformComponent>()) {
+        return glm::mat4(1.0f);
+    }
+
+    glm::mat4 LTransform = GetComponent<TransformComponent>()->GetTransform();
+
+    if (Parent != nullptr) {
+        return Parent->GetWorldTransform() * LTransform;
+    }
+
+    return LTransform;
+}
