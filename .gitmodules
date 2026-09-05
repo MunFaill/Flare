@@ -4,3 +4,6 @@
 [submodule "Vendor/glm"]
 	path = Vendor/glm
 	url = https://github.com/g-truc/glm.git
+[submodule "Vendor/Box3D"]
+	path = Vendor/Box3D
+	url = https://github.com/erincatto/box3d.git
