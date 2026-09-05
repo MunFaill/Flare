@@ -35,6 +35,4 @@ Unix-like systems
 See [Sandbox](Sandbox) for use examples.
 
 ### Images from Sandbox application:
-![Sky](Docs/FlareSkyScreenShot.png)
-![Multi Lights](Docs/MultiLightSpinCube.png)
-![GLTF Rendering](Docs/FlareScreenShot.png)
+![SC](Docs/FlareScreenshot.png)
