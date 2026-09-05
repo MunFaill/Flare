@@ -1,4 +1,5 @@
 #include "app.h"
+#include "Scene/Entities/Components.h"
 
 // Probably insecure!
 static Entity* camera;
@@ -40,6 +41,7 @@ void App::OnStart() {
 
 void App::OnUpdate(float delta) {
     cube->GetComponent<TransformComponent>()->Rotation.x += 50.0f * delta;
+    cube->GetComponent<TransformComponent>()->Rotation.y += 50.0f * delta;
     cube->GetComponent<TransformComponent>()->Rotation.z += 50.0f * delta;
 }
 

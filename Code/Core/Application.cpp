@@ -22,17 +22,20 @@ void Application::Run() {
     // Initialize modules
     WindowBackend::Init();
     Modules->WindowModule->Init();
+    Modules->InputModule->Initialize(*Modules->WindowModule);
     Pipeline.Init(*Modules->WindowModule);
 
     OnStart(); // OnStart is called once after creation and initialization
 
     while (Running) { // Called every frame
+        _time.Update();
+        
+        Modules->InputModule->Update();
+        
         OnUpdate(_time.Delta);
         if (Modules->WindowModule->CloseEvent()) Running = false;
-        _time.Update();
-        Pipeline.Update(*Modules->SceneModule);
 
-        Modules->InputModule->Update(*Modules->WindowModule);
+        Pipeline.Update(*Modules->SceneModule);
         Modules->WindowModule->SwapBuffers();
     }
 

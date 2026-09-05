@@ -9,7 +9,8 @@ class Window;
 
 class Input {
     public:
-        void Update(Window& window);
+        void Initialize(Window& window);
+        void Update();
         void HideCursor(bool Status);
         void SetCursorPosition(float x, float y);
         void GetCursorPosition(double* X, double* Y);

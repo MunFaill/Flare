@@ -123,5 +123,6 @@ enum Key {
     KEY_MENU             =    348,
     MOUSE_BUTTON_LEFT    =    0,
     MOUSE_BUTTON_RIGHT   =    1,
-    MOUSE_BUTTON_MIDDLE  =    2
+    MOUSE_BUTTON_MIDDLE  =    2,
+    MOUSE_BUTTON_LAST    =    7
 };
