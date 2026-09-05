@@ -13,6 +13,20 @@ void Input::Update(Window& window) {
     }
 }
 
+void Input::HideCursor(bool Status) {
+    if (Status) glfwSetInputMode(m_WindowHandle, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    else glfwSetInputMode(m_WindowHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
+void Input::SetCursorPosition(float x, float y) {
+    glfwSetCursorPos(m_WindowHandle, x, y);
+}
+
+void Input::GetCursorPosition(double* X, double* Y) {
+    glfwGetCursorPos(m_WindowHandle, X, Y);
+}
+
+
 bool Input::KeyPressed(Key key) {
     if (!m_WindowHandle) return false;
 
