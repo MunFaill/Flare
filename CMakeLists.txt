@@ -22,30 +22,35 @@ add_subdirectory(Vendor/glfw)
 
 add_subdirectory(Vendor/glm)
 
+# Box3D
+
+add_subdirectory(Vendor/Box3D)
+
 # Flare
 
 file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/Code/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/Code/*.h"
+    Code/*.cpp
+    Code/*.h
 )
 
 add_library(Flare SHARED ${LIB_SOURCES})
 
 target_include_directories(Flare PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/Code"
-    "${CMAKE_CURRENT_SOURCE_DIR}/Vendor/Glad"
-    "${CMAKE_CURRENT_SOURCE_DIR}/Vendor/cgltf"
-    "${CMAKE_CURRENT_SOURCE_DIR}/Vendor/stb"
+    Code/
+    Vendor/Glad
+    Vendor/cgltf
+    Vendor/stb
 )
 
 target_link_libraries(Flare PUBLIC glfw)
 target_link_libraries(Flare PUBLIC glm::glm)
+target_link_libraries(Flare PUBLIC box3d::box3d)
 
 #Sandbox
 
 file(GLOB_RECURSE SANDBOX_SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/Sandbox/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/Sandbox/*.h"
+    Sandbox/*.cpp
+    Sandbox/*.h
 )
 
 add_executable(Sandbox ${SANDBOX_SOURCES})
