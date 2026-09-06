@@ -45,13 +45,11 @@ struct AmbientComponent {
 
 struct DirectionalLightComponent {
     glm::vec3 LightColor{1.0f};
-    glm::vec3 Diffuse{1.0f};
     glm::vec3 Specular{0.5f};
 };
 
 struct PointLightComponent {
     glm::vec3 LightColor{1.0f};
-    glm::vec3 Diffuse{1.0f};
     glm::vec3 Specular{0.5f};
     float Constant = 1.0f;
     float Linear = 1.0f;

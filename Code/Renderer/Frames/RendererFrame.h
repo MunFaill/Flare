@@ -20,15 +20,12 @@ struct CameraData {
 struct DirectionalLightData {
     glm::vec3 Direction{0.0f};
     glm::vec3 Color{1.0f};
-    glm::vec3 Diffuse{1.0f};
     glm::vec3 Specular{1.0f};
 };
 
 struct PointLightData {
     glm::vec3 Position{0.0f};
     glm::vec3 Color{1.0f};
-
-    glm::vec3 Diffuse{1.0f};
     glm::vec3 Specular{1.0f};
 
     float Constant = 1.0f;

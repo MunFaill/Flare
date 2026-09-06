@@ -79,11 +79,6 @@ void GeometryPass::SetupLights(Shader& shader, const RenderFrame& frame) {
         );
 
         shader.SetVec3(
-            "dirlight.Diffuse",
-            light.Diffuse
-        );
-
-        shader.SetVec3(
             "dirlight.Specular",
             light.Specular
         );
@@ -114,11 +109,6 @@ void GeometryPass::SetupLights(Shader& shader, const RenderFrame& frame) {
         shader.SetVec3(
             prefix + "LightColor",
             light.Color
-        );
-
-        shader.SetVec3(
-            prefix + "Diffuse",
-            light.Diffuse
         );
 
         shader.SetVec3(
