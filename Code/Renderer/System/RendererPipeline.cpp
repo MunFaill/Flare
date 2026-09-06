@@ -5,6 +5,7 @@
 #include <glm/trigonometric.hpp>
 
 #include "Platform/Windowing/Window.h"
+#include "Scene/Entities/Components.h"
 #include "Scene/Scene.h"
 
 void RendererSystem::Init(Window& window) {
@@ -52,7 +53,7 @@ RenderFrame RendererSystem::BuildFrame(Scene& scene) {
             continue;
         }
 
-        auto* camera = entity->GetComponent<CameraComponent>();
+        CameraComponent* camera = entity->GetComponent<CameraComponent>();
 
         glm::mat4 world = entity->GetWorldTransform();
 
@@ -80,15 +81,13 @@ RenderFrame RendererSystem::BuildFrame(Scene& scene) {
             continue;
         }
 
-        auto* transform = entity->GetComponent<TransformComponent>();
+        TransformComponent* transform = entity->GetComponent<TransformComponent>();
 
-        auto* light = entity->GetComponent<DirectionalLightComponent>();
+        DirectionalLightComponent* light = entity->GetComponent<DirectionalLightComponent>();
 
         frame.DirectionalLight.Direction = transform->Rotation;
 
         frame.DirectionalLight.Color = light->LightColor;
-
-        frame.DirectionalLight.Diffuse = light->Diffuse;
 
         frame.DirectionalLight.Specular = light->Specular;
 
@@ -107,16 +106,15 @@ RenderFrame RendererSystem::BuildFrame(Scene& scene) {
         if (frame.PointLights.size() >= 8)
             break;
 
-        auto* transform = entity->GetComponent<TransformComponent>();
+        TransformComponent* transform = entity->GetComponent<TransformComponent>();
 
-        auto* light = entity->GetComponent<PointLightComponent>();
+        PointLightComponent* light = entity->GetComponent<PointLightComponent>();
 
         PointLightData data;
 
         data.Position = glm::vec3(entity->GetWorldTransform()[3]);
 
         data.Color = light->LightColor;
-        data.Diffuse = light->Diffuse;
         data.Specular = light->Specular;
 
         data.Constant = light->Constant;

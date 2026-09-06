@@ -34,6 +34,7 @@ void App::OnStart() {
     sun->AddComponent<DirectionalLightComponent>();
 
     ambient->AddComponent<AmbientComponent>().TextureID = "SkyTexture";
+    ambient->GetComponent<AmbientComponent>()->Type = Sky; // Use a sky texture, default is color (Ambient Color)
 
     light->AddComponent<TransformComponent>().Position = {1.0f, -1.0f, 2.0f};
     light->AddComponent<PointLightComponent>().LightColor = {1.0f, 0.0f, 0.0f};
