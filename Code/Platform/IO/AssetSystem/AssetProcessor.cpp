@@ -109,6 +109,11 @@ void AssetProcessor::ProcessImages(const std::string& File) {
     int W, H, Nrc;
     uint8_t* Data = stbi_load(File.c_str(), &W, &H, &Nrc, 4);
 
+    if (!Data) {
+        std::println("Failed to load image: {}", File);
+        return;
+    }
+
     std::unique_ptr<Texture> texture = Texture::Create();
     texture->SendData(Data, W, H);
     stbi_image_free(Data);
@@ -122,6 +127,7 @@ void AssetProcessor::ProcessMeshes(const std::string& File) {
 
     if (result != cgltf_result_success) {
         std::println("Error when parsing file {}", File);
+        return;
     }
 
     result = cgltf_load_buffers(&options, data, File.c_str());

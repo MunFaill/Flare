@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <memory>
 #include <typeindex>
-#include "Scene/Entities/Components.h"
+#include <glm/glm.hpp>
 
 class Scene;
 

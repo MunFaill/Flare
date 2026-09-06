@@ -26,7 +26,7 @@ void AmbientPass::Execute(Scene& scene, const RenderFrame& frame) {
             Shader* shader = Assets::Shaders.Get(ambient->ShaderID);
             Texture* texture = Assets::Textures.Get(ambient->TextureID);
 
-            if (!shader || !texture)
+            if (!shader || !texture || !shaderBase)
                 continue;
 
             shaderBase->Bind();

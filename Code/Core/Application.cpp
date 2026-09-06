@@ -41,6 +41,8 @@ void Application::Run() {
 
     OnShutdown();
 
+    Pipeline.Shutdown();
+
     Assets::Textures.Clear();
     Assets::Shaders.Clear();
     Assets::Meshes.Clear();
@@ -48,9 +50,6 @@ void Application::Run() {
     Modules->SceneModule.reset();
     Modules->InputModule.reset();
     Modules->AssetProcessorModule.reset();
-    Modules->InputModule.reset();
-
-    Pipeline.Shutdown();
 
     Modules->WindowModule->Shutdown();
     Modules->WindowModule.reset();

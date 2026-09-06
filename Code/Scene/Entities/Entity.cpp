@@ -1,4 +1,5 @@
 #include "Scene/Entities/Entity.h"
+#include "Scene/Entities/Components.h"
 
 void Entity::AddChild(Entity* child) {
     if (!child) return;
