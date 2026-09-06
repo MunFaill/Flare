@@ -37,7 +37,7 @@ in vec2 vTexCoord;
 in vec4 vColor;
 
 struct Environment {
-    vec4 AmbientColor;
+    vec3 AmbientColor;
 };
 
 uniform PointLight pointlights[MAX_LIGHTS];
@@ -55,7 +55,7 @@ void main() {
     vec4 baseColor = GetBaseColor(material, vTexCoord, vColor);
     vec4 specColor = GetSpecularColor(material, vTexCoord);
 
-    vec3 ambientContrib = length(environment.AmbientColor.rgb) <= 0.001 ? vec3(0.05) : environment.AmbientColor.rgb * 0.1;
+    vec3 ambientContrib = length(environment.AmbientColor) <= 0.001 ? vec3(0.05) : environment.AmbientColor * 0.1;
 
     vec3 result = ambientContrib * baseColor.rgb;
 

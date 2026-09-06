@@ -21,31 +21,42 @@ void AmbientPass::Execute(Scene& scene, const RenderFrame& frame) {
 
         auto* ambient = entity->GetComponent<AmbientComponent>();
 
-        Shader* shader = Assets::Shaders.Get(ambient->ShaderID);
-        Texture* texture = Assets::Textures.Get(ambient->TextureID);
+        if (ambient->Type == AmbientType::Sky) {
+            Shader* shader = Assets::Shaders.Get(ambient->ShaderID);
+            Texture* texture = Assets::Textures.Get(ambient->TextureID);
 
-        if (!shader || !texture)
-            continue;
+            if (!shader || !texture)
+                continue;
 
-        shader->Bind();
+            shader->Bind();
 
-        shader->SetMat4("u_InverseProjection", glm::inverse(frame.Camera.Projection));
+            shader->SetMat4("u_InverseProjection", glm::inverse(frame.Camera.Projection));
 
-        glm::mat4 viewRotation =
-            glm::mat4(glm::mat3(frame.Camera.View));
+            glm::mat4 viewRotation =
+                glm::mat4(glm::mat3(frame.Camera.View));
 
-        shader->SetMat4("u_InverseView", glm::inverse(viewRotation));
+            shader->SetMat4("u_InverseView", glm::inverse(viewRotation));
 
-        shader->SetFloat("u_Exposure", ambient->Exposure);
+            shader->SetFloat("u_Exposure", ambient->Exposure);
 
-        shader->SetInt("u_SkyTexture", 0);
+            shader->SetInt("u_SkyTexture", 0);
 
-        texture->Bind(0);
+            texture->Bind(0);
 
-        m_Context.SetDepthFunc(DEPTH_LEQUAL);
+            m_Context.SetDepthFunc(DEPTH_LEQUAL);
 
-        m_Context.DrawArrays(3);
+            m_Context.DrawArrays(3);
 
-        m_Context.SetDepthFunc(DEPTH_LESS);
+            m_Context.SetDepthFunc(DEPTH_LESS);
+        } else {
+            Shader* shader = Assets::Shaders.Get("Base");
+
+            if (!shader)
+                continue;
+
+            shader->Bind();
+
+            shader->SetVec3("environment.AmbientColor", ambient->AmbientColor);
+        };
     }
 }
