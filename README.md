@@ -3,7 +3,9 @@
 ### A toy engine/framework
 Inspired on the Urho3D engine and Hazel engine
 
-[Sandbox sky textyre by AmbientCG](https://ambientcg.com/view?id=DayEnvironmentHDRI112)
+### [Sandbox sky textyre by AmbientCG](https://ambientcg.com/view?id=DayEnvironmentHDRI112)
+
+- - -
 
 ### Features and vendor
 
@@ -14,6 +16,9 @@ Inspired on the Urho3D engine and Hazel engine
 - Windowing (by glfw);
 - Math (by glm).
 - Forward rendering (8 lights + one directional light are suported)
+- Physics -not yet implemented (by Box3D)
+
+- - -
 
 ### Building from source
 
@@ -31,8 +36,22 @@ Unix-like systems
     # Execute (From the root folder)
     ./build/Sandbox
 ```
+- - -
+### Using Flare in your project
 
-See [Sandbox](Sandbox) for use examples.
+On your CMakeLists.txt, add:
 
+``` CMake
+# Your cmake code [...]
+
+add_subdirectory(External/Flare) # The path to Flare folder
+add_executable(YourApp main.cpp)
+target_link_libraries(YourApp PRIVATE Flare)
+
+# Your cmake code [...]
+```
+
+### See [Sandbox](Sandbox) for use examples.
+- - -
 ### Images from Sandbox application:
 ![SC](Docs/FlareScreenshot.png)
