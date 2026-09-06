@@ -22,14 +22,17 @@ void AmbientPass::Execute(Scene& scene, const RenderFrame& frame) {
         auto* ambient = entity->GetComponent<AmbientComponent>();
 
         if (ambient->Type == AmbientType::Sky) {
+            Shader* shaderBase = Assets::Shaders.Get("Base");
             Shader* shader = Assets::Shaders.Get(ambient->ShaderID);
             Texture* texture = Assets::Textures.Get(ambient->TextureID);
 
             if (!shader || !texture)
                 continue;
 
+            shaderBase->Bind();
             shader->Bind();
 
+            shaderBase->SetVec3("environment.AmbientColor", ambient->AmbientColor);
             shader->SetMat4("u_InverseProjection", glm::inverse(frame.Camera.Projection));
 
             glm::mat4 viewRotation =
