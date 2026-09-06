@@ -1,5 +1,4 @@
 #include "app.h"
-#include "Scene/Entities/Components.h"
 
 // Probably insecure!
 static Entity* camera;
