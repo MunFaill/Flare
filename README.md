@@ -1,5 +1,8 @@
 # Flare engine
 
+> [!NOTICE]
+> Development and updates are on hold for a while
+
 ### A toy engine/framework
 Inspired on the Urho3D engine and Hazel engine
 
