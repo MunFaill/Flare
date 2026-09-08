@@ -1,6 +1,6 @@
 # Flare engine
 
-> [!NOTICE]
+> [!NOTE]
 > Development and updates are on hold for a while
 
 ### A toy engine/framework
