@@ -4,7 +4,8 @@
 #include <glm/glm.hpp>
 
 enum AmbientType {
-    Color = 0, Sky = 1
+    Color = 0,
+    Sky = 1
 };
 
 struct TransformComponent {
@@ -16,16 +17,15 @@ struct TransformComponent {
 };
 
 struct MaterialComponent {
-    std::string ShaderID = "Base";
-    std::string DiffuseID = "DefaultDiffuse";
-    std::string SpecularID = "DefaultSpecular";
-    glm::vec4 Albedo{1.0f};
-    float SpecularPower = 32.0f;
+    std::string MaterialID = "";
 };
 
 struct MeshComponent {
     std::string MeshID = "";
-    MaterialComponent Material = {};
+};
+
+struct ModelComponent {
+    std::string ModelID = "";
 };
 
 struct CameraComponent {
@@ -44,6 +44,7 @@ struct AmbientComponent {
 };
 
 struct DirectionalLightComponent {
+    glm::vec3 Direction{0.0f, -1.0f, 0.0f};
     glm::vec3 LightColor{1.0f};
     glm::vec3 Specular{0.5f};
 };

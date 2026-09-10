@@ -1,20 +1,26 @@
 #pragma once
 
-#include "Renderer/Passes/RendererPass.h"
-
 class DeviceContext;
-class MaterialComponent;
+class Entity;
+class Material;
+class Mesh;
+class Shader;
+class Scene;
+class RenderFrame;
 
-class GeometryPass : public RenderPass {
+class GeometryPass {
 public:
-    explicit GeometryPass(DeviceContext& context);
+    GeometryPass(DeviceContext& context);
 
-    void Execute(Scene& scene, const RenderFrame& frame) override;
+    void Execute(Scene& scene, const RenderFrame& frame);
 
 private:
-    void SetupLights(Shader& shader, const RenderFrame& frame);
+    void RenderModel(Entity& entity, const RenderFrame& frame);
+    void RenderMesh(Entity& entity, const RenderFrame& frame);
+    void RenderMeshPart(Entity& entity, const RenderFrame& frame, Mesh& mesh, Material& material, Shader& shader);
 
-    void SetupMaterial(Shader& shader, const MaterialComponent& material);
+    void SetupLights(Shader& shader, const RenderFrame& frame);
+    void SetupMaterial(Shader& shader, const Material& material);
 
 private:
     DeviceContext& m_Context;

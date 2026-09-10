@@ -26,6 +26,14 @@ add_subdirectory(Vendor/glm)
 
 add_subdirectory(Vendor/Box3D)
 
+# Assimp
+
+set(ASSIMP_BUILD_ZLIB ON CACHE BOOL "" FORCE)
+set(ASSIMP_FORCE_BUILD_ZLIB ON CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+
+add_subdirectory(Vendor/Assimp)
+
 # Flare
 
 file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS
@@ -38,13 +46,13 @@ add_library(Flare SHARED ${LIB_SOURCES})
 target_include_directories(Flare PUBLIC
     Code/
     Vendor/Glad
-    Vendor/cgltf
     Vendor/stb
 )
 
 target_link_libraries(Flare PUBLIC glfw)
 target_link_libraries(Flare PUBLIC glm::glm)
 target_link_libraries(Flare PUBLIC box3d::box3d)
+target_link_libraries(Flare PUBLIC assimp::assimp)
 
 #Sandbox
 

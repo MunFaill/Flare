@@ -7,6 +7,9 @@
 #include "Scene/Entities/Components.h"
 #include "Scene/Entities/Entity.h"
 
+#include <algorithm>
+#include <string>
+
 GeometryPass::GeometryPass(DeviceContext& context)
     : m_Context(context) {
 }
@@ -15,58 +18,109 @@ void GeometryPass::Execute(Scene& scene, const RenderFrame& frame) {
     if (!frame.HasCamera)
         return;
 
-    for (auto& entity : scene.GetEntities()) {
-        if (!entity->HasComponent<TransformComponent>() ||
-            !entity->HasComponent<MeshComponent>()) {
+    for (std::unique_ptr<Entity>& entity : scene.GetEntities()) {
+        if (!entity->HasComponent<TransformComponent>())
             continue;
+
+        if (entity->HasComponent<ModelComponent>()) {
+            RenderModel(*entity, frame);
         }
+        else if (entity->HasComponent<MeshComponent>()) {
+            RenderMesh(*entity, frame);
+        }
+    }
+}
 
-        auto* meshComponent =
-            entity->GetComponent<MeshComponent>();
+void GeometryPass::RenderModel(Entity& entity, const RenderFrame& frame) {
+    ModelComponent* modelComponent = entity.GetComponent<ModelComponent>();
 
-        Mesh* mesh =
-            Assets::Meshes.Get(meshComponent->MeshID);
+    if (!modelComponent)
+        return;
 
-        MaterialComponent& material =
-            meshComponent->Material;
+    Model* model = Assets::Models.Get(modelComponent->ModelID);
 
-        Shader* shader =
-            Assets::Shaders.Get(material.ShaderID);
+    if (!model)
+        return;
 
-        if (!mesh || !shader)
+    for (const MeshPart& part : model->MeshParts) {
+        Mesh* mesh = Assets::Meshes.Get(part.MeshID);
+        Material* material = Assets::Materials.Get(part.MaterialID);
+
+        if (!mesh || !material)
             continue;
 
-        shader->Bind();
+        Shader* shader = Assets::Shaders.Get(material->ShaderID);
 
-        shader->SetMat4(
-            "u_Model",
-            entity->GetWorldTransform()
-        );
+        if (!shader)
+            continue;
 
-        shader->SetMat4(
-            "u_ViewProjection",
-            frame.Camera.ViewProjection
-        );
-
-        shader->SetVec3(
-            "viewPos",
-            frame.Camera.Position
-        );
-
-        SetupLights(*shader, frame);
-        SetupMaterial(*shader, material);
-
-        mesh->Bind();
-
-        m_Context.DrawCall(
-            mesh->GetIndexCount()
-        );
+        RenderMeshPart(entity, frame, *mesh, *material, *shader);
     }
+}
+
+void GeometryPass::RenderMesh(Entity& entity, const RenderFrame& frame) {
+    MeshComponent* meshComponent = entity.GetComponent<MeshComponent>();
+
+    if (!meshComponent)
+        return;
+
+    Mesh* mesh = Assets::Meshes.Get(meshComponent->MeshID);
+
+    if (!mesh)
+        return;
+
+    if (!entity.HasComponent<MaterialComponent>())
+        return;
+
+    MaterialComponent* materialComponent = entity.GetComponent<MaterialComponent>();
+
+    if (!materialComponent)
+        return;
+
+    Material* material = Assets::Materials.Get(materialComponent->MaterialID);
+
+    if (!material)
+        return;
+
+    Shader* shader = Assets::Shaders.Get(material->ShaderID);
+
+    if (!shader)
+        return;
+
+    RenderMeshPart(entity, frame, *mesh, *material, *shader);
+}
+
+void GeometryPass::RenderMeshPart(Entity& entity, const RenderFrame& frame, Mesh& mesh, Material& material, Shader& shader) {
+    shader.Bind();
+
+    shader.SetMat4(
+        "u_Model",
+        entity.GetWorldTransform()
+    );
+
+    shader.SetMat4(
+        "u_ViewProjection",
+        frame.Camera.ViewProjection
+    );
+
+    shader.SetVec3(
+        "viewPos",
+        frame.Camera.Position
+    );
+
+    SetupLights(shader, frame);
+    SetupMaterial(shader, material);
+
+    mesh.Bind();
+
+    m_Context.DrawCall(
+        mesh.GetIndexCount()
+    );
 }
 
 void GeometryPass::SetupLights(Shader& shader, const RenderFrame& frame) {
     if (frame.HasDirectionalLight) {
-        const auto& light = frame.DirectionalLight;
+        const DirectionalLightData& light = frame.DirectionalLight;
 
         shader.SetVec3(
             "dirlight.LightDirection",
@@ -94,7 +148,7 @@ void GeometryPass::SetupLights(Shader& shader, const RenderFrame& frame) {
     );
 
     for (int i = 0; i < count; ++i) {
-        const auto& light = frame.PointLights[i];
+        const PointLightData& light = frame.PointLights[i];
 
         std::string prefix =
             "pointlights[" +
@@ -135,34 +189,23 @@ void GeometryPass::SetupLights(Shader& shader, const RenderFrame& frame) {
     shader.SetInt("u_NumPointLights", count);
 }
 
-void GeometryPass::SetupMaterial(Shader& shader, const MaterialComponent& material) {
+void GeometryPass::SetupMaterial(Shader& shader, const Material& material) {
     shader.SetInt("material.Diffuse", 0);
     shader.SetInt("material.Specular", 1);
-
-    shader.SetFloat(
-        "material.SpecularPower",
-        material.SpecularPower
-    );
 
     shader.SetVec4(
         "material.Albedo",
         material.Albedo
     );
 
-    if (Assets::Textures.Has(material.DiffuseID)) {
-        Assets::Textures
-            .Get(material.DiffuseID)
-            ->Bind(0);
+    if (Assets::Textures.Has(material.DiffuseTextureID)) {
+        Assets::Textures.Get(material.DiffuseTextureID)->Bind(0);
     }
 
-    if (Assets::Textures.Has(material.SpecularID)) {
-        Assets::Textures
-            .Get(material.SpecularID)
-            ->Bind(1);
+    if (Assets::Textures.Has(material.SpecularTextureID)) {
+        Assets::Textures.Get(material.SpecularTextureID)->Bind(1);
     }
     else if (Assets::Textures.Has("Default")) {
-        Assets::Textures
-            .Get("Default")
-            ->Bind(1);
+        Assets::Textures.Get("Default")->Bind(1);
     }
 }

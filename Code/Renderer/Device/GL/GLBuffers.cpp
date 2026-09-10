@@ -26,7 +26,7 @@ void GLVertexBuffer::Unbind() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void GLVertexBuffer::SendData(void* Data, uint32_t Size) {
+void GLVertexBuffer::SendData(const void* Data, uint32_t Size) {
     this->Bind();
     glBufferData(GL_ARRAY_BUFFER, Size, Data, GL_STATIC_DRAW);
     m_Size = Size;
@@ -56,7 +56,7 @@ void GLIndexBuffer::Unbind() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void GLIndexBuffer::SendData(uint32_t* Data, uint32_t Count) {
+void GLIndexBuffer::SendData(const uint32_t* Data, uint32_t Count) {
     this->Bind();
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, Count * sizeof(uint32_t), Data, GL_STATIC_DRAW);
     m_Count = Count;

@@ -1,4 +1,5 @@
 #include "app.h"
+#include "Scene/Entities/Components.h"
 
 // Probably insecure!
 static Entity* camera;
@@ -27,7 +28,7 @@ void App::OnStart() {
     camera->AddComponent<CameraComponent>(); // Default parameters
 
     cube->AddComponent<TransformComponent>();
-    cube->AddComponent<MeshComponent>().MeshID = "Cube";
+    cube->AddComponent<ModelComponent>().ModelID = "Cube";
 
     sun->AddComponent<TransformComponent>().Rotation = {-5.0f, -5.0f, -5.0f};
     sun->AddComponent<DirectionalLightComponent>();

@@ -11,7 +11,7 @@ class GLVertexBuffer : public VertexBuffer {
 
         void Bind() override;
         void Unbind() override;
-        void SendData(void* Data, uint32_t Size) override;
+        void SendData(const void* Data, uint32_t Size) override;
         inline uint32_t GetSize() override {return m_Size;}
     private:
         uint32_t VBO = 0;
@@ -25,7 +25,7 @@ class GLIndexBuffer : public IndexBuffer {
 
         void Bind() override;
         void Unbind() override;
-        void SendData(uint32_t* Data, uint32_t Count) override;
+        void SendData(const uint32_t* Data, uint32_t Count) override;
         uint32_t GetCount() override {return m_Count;}
     private:
         uint32_t EBO;

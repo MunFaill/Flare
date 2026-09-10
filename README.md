@@ -1,8 +1,5 @@
 # Flare engine
 
-> [!NOTE]
-> Development and updates are on hold for a while
-
 ### A toy engine/framework
 Inspired on the Urho3D engine and Hazel engine
 
@@ -12,13 +9,14 @@ Inspired on the Urho3D engine and Hazel engine
 
 ### Features and vendor
 
-- GLTF loader (by cgltf);
+- Model importer (by Assimp);
 - Image loader (by stb);
 - Custom Entity Component;
+- Asset manager and processor;
 - OpenGL 4.6 core and Vulkan -vulkan not yet implemented- (by Glad 2.0);
 - Windowing (by glfw);
-- Math (by glm).
-- Forward rendering (8 lights + one directional light are suported)
+- Math (by glm);
+- Forward rendering (8 lights + one directional light are suported);
 - Physics -not yet implemented (by Box3D)
 
 - - -

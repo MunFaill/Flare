@@ -18,7 +18,7 @@ class VertexBuffer {
 
         virtual void Bind() = 0;
         virtual void Unbind() = 0;
-        virtual void SendData(void* Data, uint32_t Size) = 0;
+        virtual void SendData(const void* Data, uint32_t Size) = 0;
         virtual uint32_t GetSize() = 0;
 
         static std::unique_ptr<VertexBuffer> Create();
@@ -30,7 +30,7 @@ class IndexBuffer {
 
         virtual void Bind() = 0;
         virtual void Unbind() = 0;
-        virtual void SendData(uint32_t* Data, uint32_t Count) = 0;
+        virtual void SendData(const uint32_t* Data, uint32_t Count) = 0;
         virtual uint32_t GetCount() = 0;
 
         static std::unique_ptr<IndexBuffer> Create();

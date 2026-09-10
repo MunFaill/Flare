@@ -48,3 +48,7 @@ std::vector<std::string> File::ScanFolder(const std::string& Path) {
 
     return FilesInPath;
 }
+
+std::string File::GetFileName(const std::string& Path) {
+    return std::filesystem::path(Path).stem().string();
+}
