@@ -10,8 +10,7 @@
 #include <algorithm>
 #include <string>
 
-GeometryPass::GeometryPass(DeviceContext& context)
-    : m_Context(context) {
+GeometryPass::GeometryPass(DeviceContext& context) : m_Context(context) {
 }
 
 void GeometryPass::Execute(Scene& scene, const RenderFrame& frame) {
@@ -93,49 +92,29 @@ void GeometryPass::RenderMesh(Entity& entity, const RenderFrame& frame) {
 void GeometryPass::RenderMeshPart(Entity& entity, const RenderFrame& frame, Mesh& mesh, Material& material, Shader& shader) {
     shader.Bind();
 
-    shader.SetMat4(
-        "u_Model",
-        entity.GetWorldTransform()
-    );
+    shader.SetMat4("u_Model", entity.GetWorldTransform());
 
-    shader.SetMat4(
-        "u_ViewProjection",
-        frame.Camera.ViewProjection
-    );
+    shader.SetMat4("u_ViewProjection", frame.Camera.ViewProjection);
 
-    shader.SetVec3(
-        "viewPos",
-        frame.Camera.Position
-    );
+    shader.SetVec3("viewPos", frame.Camera.Position);
 
     SetupLights(shader, frame);
     SetupMaterial(shader, material);
 
     mesh.Bind();
 
-    m_Context.DrawCall(
-        mesh.GetIndexCount()
-    );
+    m_Context.DrawIndices(mesh.GetIndexCount());
 }
 
 void GeometryPass::SetupLights(Shader& shader, const RenderFrame& frame) {
     if (frame.HasDirectionalLight) {
         const DirectionalLightData& light = frame.DirectionalLight;
 
-        shader.SetVec3(
-            "dirlight.LightDirection",
-            light.Direction
-        );
+        shader.SetVec3("dirlight.LightDirection", light.Direction);
 
-        shader.SetVec3(
-            "dirlight.LightColor",
-            light.Color
-        );
+        shader.SetVec3( "dirlight.LightColor",light.Color);
 
-        shader.SetVec3(
-            "dirlight.Specular",
-            light.Specular
-        );
+        shader.SetVec3("dirlight.Specular", light.Specular);
     }
 
     const int maxLights = 8;
@@ -150,40 +129,19 @@ void GeometryPass::SetupLights(Shader& shader, const RenderFrame& frame) {
     for (int i = 0; i < count; ++i) {
         const PointLightData& light = frame.PointLights[i];
 
-        std::string prefix =
-            "pointlights[" +
-            std::to_string(i) +
-            "].";
+        std::string prefix = "pointlights[" +std::to_string(i) +"].";
 
-        shader.SetVec3(
-            prefix + "LightPosition",
-            light.Position
-        );
+        shader.SetVec3(prefix + "LightPosition", light.Position);
 
-        shader.SetVec3(
-            prefix + "LightColor",
-            light.Color
-        );
+        shader.SetVec3(prefix + "LightColor", light.Color);
 
-        shader.SetVec3(
-            prefix + "Specular",
-            light.Specular
-        );
+        shader.SetVec3(prefix + "Specular", light.Specular);
 
-        shader.SetFloat(
-            prefix + "Constant",
-            light.Constant
-        );
+        shader.SetFloat(prefix + "Constant", light.Constant);
 
-        shader.SetFloat(
-            prefix + "Linear",
-            light.Linear
-        );
+        shader.SetFloat(prefix + "Linear", light.Linear);
 
-        shader.SetFloat(
-            prefix + "Quadratic",
-            light.Quadratic
-        );
+        shader.SetFloat(prefix + "Quadratic", light.Quadratic);
     }
 
     shader.SetInt("u_NumPointLights", count);

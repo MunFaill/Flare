@@ -45,18 +45,16 @@ void GLContext::DrawArrays(int x) {
     glDrawArrays(GL_TRIANGLES, 0, x);
 }
 
-void GLContext::DrawCall(uint32_t IndexCount) {
+void GLContext::DrawIndices(uint32_t IndexCount) {
     glDrawElements(GL_TRIANGLES, IndexCount, GL_UNSIGNED_INT, nullptr);
 }
 
-void GLContext::SetDepthFunc(uint32_t func) {
-    glDepthFunc(func);
+void GLContext::SetBlendFuncLess() {
+    glDepthFunc(GL_LESS);
 }
-
-void GLContext::SetBlendFuncs(uint32_t func1, uint32_t func2) {
-    glBlendFunc(func1, func2);
+void GLContext::SetBlendFuncLEqual() {
+    glDepthFunc(GL_LEQUAL);
 }
-
 
 void GLContext::DepthTest(bool State) {
     if (State) glEnable(GL_DEPTH_TEST);

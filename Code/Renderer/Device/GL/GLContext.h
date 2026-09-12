@@ -9,9 +9,9 @@ class GLContext : public DeviceContext {
 
         void Initialize(Window& window) override;
         void DrawArrays(int x) override;
-        void DrawCall(uint32_t IndexCount) override;
-        void SetDepthFunc(uint32_t func) override;
-        void SetBlendFuncs(uint32_t func1, uint32_t func2) override;
+        void DrawIndices(uint32_t IndexCount) override;
+        void SetBlendFuncLess() override;
+        void SetBlendFuncLEqual() override;
         void DepthTest(bool State) override;
         void CullFaces(bool State) override;
         void Blend(bool State) override;

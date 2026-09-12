@@ -46,11 +46,11 @@ void AmbientPass::Execute(Scene& scene, const RenderFrame& frame) {
 
             texture->Bind(0);
 
-            m_Context.SetDepthFunc(DEPTH_LEQUAL);
+            m_Context.SetBlendFuncLEqual();
 
             m_Context.DrawArrays(3);
 
-            m_Context.SetDepthFunc(DEPTH_LESS);
+            m_Context.SetBlendFuncLess();
         } else {
             Shader* shader = Assets::Shaders.Get("Base");
 

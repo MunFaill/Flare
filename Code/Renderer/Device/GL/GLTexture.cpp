@@ -39,8 +39,17 @@ void GLTexture::SendData(unsigned char* data, uint32_t Width, uint32_t Height) {
 void GLTexture::Mipmaps(bool state) {
     if (state) {
         this->Bind(LocalSlot);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
         glGenerateMipmap(GL_TEXTURE_2D);
+        this->Unbind();
+    }
+}
+
+void GLTexture::Repeat(bool state) {
+    if (state) {
+        this->Bind(LocalSlot);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         this->Unbind();
     }
 }
