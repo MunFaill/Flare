@@ -8,6 +8,12 @@ enum AmbientType {
     Sky = 1
 };
 
+enum PhysicsType {
+    StaticBody = 0,
+    DynamicBody = 1,
+    KinematicBody = 2
+};
+
 struct TransformComponent {
     glm::vec3 Position{0.0f};
     glm::vec3 Rotation{0.0f};
@@ -55,4 +61,10 @@ struct PointLightComponent {
     float Constant = 1.0f;
     float Linear = 1.0f;
     float Quadratic = 0.5f;
+};
+
+struct BoxCollisionComponent {
+    PhysicsType BodyType = StaticBody;
+    float Density = 1.0f;
+    float Friction = 0.3f;
 };

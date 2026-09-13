@@ -3,9 +3,11 @@
 #include "IO/AssetSystem/Assets.h"
 #include "IO/Windowing/WindowBackend.h"
 #include "Renderer/Pipeline/RendererPipeline.h"
+#include "Physics/Physics.h"
 
-static Time _time;
+static Time _Time;
 static RenderPipeline Pipeline;
+static Physics _Physics;
 
 void Application::Run() {
     // Setup and create the modules
@@ -20,7 +22,7 @@ void Application::Run() {
 
 void Application::Setup() {
     Modules = std::make_unique<EngineModules>();
-    _time.Init();
+    _Time.Init();
 
     Modules->WindowModule = Window::Create();
     Modules->InputModule = std::make_unique<Input>();
@@ -32,23 +34,29 @@ void Application::Setup() {
 
 void Application::Start() {
     WindowBackend::Init();
+
     Modules->WindowModule->Init();
     Modules->InputModule->Initialize(*Modules->WindowModule);
+    
     Pipeline.Init(*Modules->WindowModule);
 
     OnStart(); // OnStart is called once after creation and initialization
+
+    _Physics.Initialize(World);
 }
 
 void Application::Update() {
     while (Running) {
-        _time.Update();
+        _Time.Update();
         
         Modules->InputModule->Update();
         
-        OnUpdate(_time.Delta);
+        OnUpdate(_Time.Delta);
         if (Modules->WindowModule->CloseEvent()) Running = false;
 
+        _Physics.Update(World, _Time.Delta);
         Pipeline.Update(World);
+
         Modules->WindowModule->SwapBuffers();
     }
 }
@@ -56,6 +64,7 @@ void Application::Update() {
 void Application::Shutdown() {
     OnShutdown();
 
+    _Physics.Shutdown();
     Pipeline.Shutdown();
 
     Assets::Textures.Clear();
