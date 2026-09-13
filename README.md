@@ -13,11 +13,11 @@ Inspired on the Urho3D engine and Hazel engine
 - Image loader (by stb);
 - ECS (by Flecs);
 - Asset manager and processor;
-- OpenGL 4.6 core and Vulkan -vulkan not yet implemented- (by Glad 2.0);
+- OpenGL 4.6 core (by Glad 2.0);
 - Windowing (by glfw);
 - Math (by glm);
 - Forward rendering (8 lights + one directional light are suported);
-- Physics -not yet implemented (by Box3D)
+- Physics (by Box3D)
 
 - - -
 
