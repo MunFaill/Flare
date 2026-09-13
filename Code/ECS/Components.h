@@ -19,7 +19,7 @@ struct TransformComponent {
     glm::vec3 Rotation{0.0f};
     glm::vec3 Scale{1.0f};
 
-    glm::mat4 GetTransform() const;
+    glm::mat4 GetLocalTransform() const;
 };
 
 struct MaterialComponent {

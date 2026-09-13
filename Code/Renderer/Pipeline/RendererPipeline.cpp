@@ -48,9 +48,14 @@ RenderFrame RenderPipeline::BuildFrame(flecs::world& world) {
     // Camera
     world.each([&](flecs::entity e, TransformComponent& Transform, CameraComponent& Camera) {
 
-        frame.Camera.Position = glm::vec3(Transform.GetTransform()[3]);
+        if (e.parent()) {
+            const TransformComponent& ParentTransform = e.get<TransformComponent>();
+            frame.Camera.Position = glm::vec3(Transform.GetLocalTransform()[3] * ParentTransform.GetLocalTransform()[3]);
+        } else {
+            frame.Camera.Position = glm::vec3(Transform.GetLocalTransform()[3]);
+        }
 
-        frame.Camera.View = glm::inverse(Transform.GetTransform());
+        frame.Camera.View = glm::inverse(Transform.GetLocalTransform());
 
         frame.Camera.Projection = glm::perspective(glm::radians(Camera.FOV), aspect, Camera.Near, Camera.Far);
 
@@ -81,7 +86,12 @@ RenderFrame RenderPipeline::BuildFrame(flecs::world& world) {
 
         PointLightData data;
 
-        data.Position = glm::vec3(Transform.GetTransform()[3]);
+        if (e.parent()) {
+            const TransformComponent& ParentTransform = e.get<TransformComponent>();
+            data.Position = glm::vec3(Transform.GetLocalTransform()[3] * ParentTransform.GetLocalTransform()[3]);
+        } else {
+            data.Position = glm::vec3(Transform.GetLocalTransform()[3]);
+        }
 
         data.Color = Light.LightColor;
         data.Specular = Light.Specular;

@@ -69,7 +69,12 @@ void GeometryPass::RenderMeshPart(flecs::entity& Entity, const RenderFrame& fram
     shader.Bind();
 
     const TransformComponent& transform = Entity.get<TransformComponent>();
-    shader.SetMat4("u_Model", transform.GetTransform());
+    if (Entity.parent()) {
+        const TransformComponent& ParentTransform = Entity.get<TransformComponent>();
+        shader.SetMat4("u_Model", transform.GetLocalTransform() * ParentTransform.GetLocalTransform());
+    } else {
+        shader.SetMat4("u_Model", transform.GetLocalTransform());
+    }
 
     shader.SetMat4("u_ViewProjection", frame.Camera.ViewProjection);
 
