@@ -25,13 +25,13 @@ void App::OnStart() {
     camera.set<TransformComponent>({{0.0f, -2.0f, 5.0f}}); // Customize parameters
     camera.add<CameraComponent>(); // Default parameters
 
-    cube.set<TransformComponent>({{0.0f, 5.0f, 0.0f}, {45.0f, 45.0f, 45.0f}});
+    cube.set<TransformComponent>({{0.0f, 5.0f, 0.0f}});
     cube.set<ModelComponent>({"Cube"});
-    cube.set<BoxCollisionComponent>({DynamicBody});
+    cube.set<CollisionComponent>({DynamicBody});
 
     ground.set<TransformComponent>({{0.0f, -5.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {10.0f, 1.0f, 10.0f}});
     ground.set<ModelComponent>({"Cube"});
-    ground.set<BoxCollisionComponent>({StaticBody});
+    ground.set<CollisionComponent>({StaticBody});
 
     sun.set<TransformComponent>({{}, {-5.0f, -5.0f, -5.0f}});
     sun.add<DirectionalLightComponent>();
@@ -41,7 +41,6 @@ void App::OnStart() {
 
 void App::OnUpdate(float delta)
 {
-    // Object with physics cannot move by changing it's position value yet
 }
 
 void App::OnShutdown() {

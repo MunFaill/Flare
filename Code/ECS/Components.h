@@ -14,6 +14,10 @@ enum PhysicsType {
     KinematicBody = 2
 };
 
+enum ShapeType {
+    BoxShape = 0
+};
+
 struct TransformComponent {
     glm::vec3 Position{0.0f};
     glm::vec3 Rotation{0.0f};
@@ -63,8 +67,11 @@ struct PointLightComponent {
     float Quadratic = 0.5f;
 };
 
-struct BoxCollisionComponent {
+struct CollisionComponent {
     PhysicsType BodyType = StaticBody;
+    ShapeType CollisonShape = BoxShape;
+    glm::vec3 LinearForce{0.0f};
+    glm::vec3 LinearVelocity{0.0f};
     float Density = 1.0f;
     float Friction = 0.3f;
 };
