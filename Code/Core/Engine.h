@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Platform/Windowing/Window.h"
-#include "Platform/IO/InputSystem/Input.h"
-#include "Platform/IO/AssetSystem/AssetProcessor.h"
-#include "Platform/IO/FileSystem/File.h"
+#include "IO/Windowing/Window.h"
+#include "IO/InputSystem/Input.h"
+#include "IO/AssetSystem/AssetProcessor.h"
+#include "IO/FileSystem/File.h"
 
 #include <memory>
 

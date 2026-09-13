@@ -18,4 +18,9 @@ class Application {
     protected:
         bool Running = true;
         std::unique_ptr<EngineModules> Modules;
+    private:
+        void Setup();
+        void Start();
+        void Update();
+        void Shutdown();
 };

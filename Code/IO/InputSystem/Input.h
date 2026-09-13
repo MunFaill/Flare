@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Platform/IO/InputSystem/Keys.h"
+#include "IO/InputSystem/Keys.h"
 
 #include <unordered_map>
 

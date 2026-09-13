@@ -1,4 +1,4 @@
-#include "Platform/IO/AssetSystem/AssetProcessor.h"
+#include "IO/AssetSystem/AssetProcessor.h"
 
 void AssetProcessor::Process(const std::vector<std::string>& Files) {
     for (const std::string& FilePath : Files) {

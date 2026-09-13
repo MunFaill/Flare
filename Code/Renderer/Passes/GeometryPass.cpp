@@ -1,7 +1,6 @@
 #include "Renderer/Passes/GeometryPass.h"
 #include "Renderer/Frames/RendererFrame.h"
-
-#include "Platform/IO/AssetSystem/Assets.h"
+#include "IO/AssetSystem/Assets.h"
 #include "Renderer/Device/DeviceContext.h"
 #include "ECS/Components.h"
 

@@ -1,14 +1,24 @@
 #include "Core/Application.h"
 #include "Math/Time.h"
-#include "Platform/IO/AssetSystem/Assets.h"
-#include "Platform/Windowing/WindowBackend.h"
-#include "Renderer/System/RendererPipeline.h"
+#include "IO/AssetSystem/Assets.h"
+#include "IO/Windowing/WindowBackend.h"
+#include "Renderer/Pipeline/RendererPipeline.h"
 
 static Time _time;
-static RendererSystem Pipeline;
+static RenderPipeline Pipeline;
 
 void Application::Run() {
     // Setup and create the modules
+    Setup();
+    // Initialize modules
+    Start();
+    // Called every frame
+    Update();
+    // Shutdown modules
+    Shutdown();
+}
+
+void Application::Setup() {
     Modules = std::make_unique<EngineModules>();
     _time.Init();
 
@@ -18,15 +28,19 @@ void Application::Run() {
     Modules->FileSystemModule = std::make_unique<File>();
 
     OnSetup(); // OnSetup is called once after creation and before initialization
-    // Initialize modules
+}
+
+void Application::Start() {
     WindowBackend::Init();
     Modules->WindowModule->Init();
     Modules->InputModule->Initialize(*Modules->WindowModule);
     Pipeline.Init(*Modules->WindowModule);
 
     OnStart(); // OnStart is called once after creation and initialization
+}
 
-    while (Running) { // Called every frame
+void Application::Update() {
+    while (Running) {
         _time.Update();
         
         Modules->InputModule->Update();
@@ -37,7 +51,9 @@ void Application::Run() {
         Pipeline.Update(World);
         Modules->WindowModule->SwapBuffers();
     }
+}
 
+void Application::Shutdown() {
     OnShutdown();
 
     Pipeline.Shutdown();

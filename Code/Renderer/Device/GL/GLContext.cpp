@@ -1,5 +1,5 @@
 #include "Renderer/Device/GL/GLContext.h"
-#include "Platform/Windowing/Window.h"
+#include "IO/Windowing/Window.h"
 #include "Renderer/Device/DeviceContext.h"
 
 #include <print>

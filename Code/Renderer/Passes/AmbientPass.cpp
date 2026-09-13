@@ -1,11 +1,10 @@
 #include "Renderer/Passes/AmbientPass.h"
 #include "Renderer/Frames/RendererFrame.h"
-
-#include <glm/mat4x4.hpp>
-
-#include "Platform/IO/AssetSystem/Assets.h"
+#include "IO/AssetSystem/Assets.h"
 #include "Renderer/Device/DeviceContext.h"
 #include "ECS/Components.h"
+
+#include <glm/mat4x4.hpp>
 
 AmbientPass::AmbientPass(DeviceContext& context) : m_Context(context) {
 }

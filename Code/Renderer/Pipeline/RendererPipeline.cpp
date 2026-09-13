@@ -1,13 +1,13 @@
-#include "Renderer/System/RendererPipeline.h"
+#include "Renderer/Pipeline/RendererPipeline.h"
 #include "Renderer/Frames/RendererFrame.h"
 
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/trigonometric.hpp>
 
-#include "Platform/Windowing/Window.h"
+#include "IO/Windowing/Window.h"
 #include "ECS/Components.h"
 
-void RendererSystem::Init(Window& window) {
+void RenderPipeline::Init(Window& window) {
     m_Context = DeviceContext::Create();
     m_Context->Initialize(window);
 
@@ -24,7 +24,7 @@ void RendererSystem::Init(Window& window) {
         std::make_unique<GeometryPass>(*m_Context);
 }
 
-void RendererSystem::Update(flecs::world& world) {
+void RenderPipeline::Update(flecs::world& world) {
     RenderFrame frame = BuildFrame(world);
 
     m_Context->Clear({0.0f, 0.0f, 0.0f, 1.0f});
@@ -33,14 +33,14 @@ void RendererSystem::Update(flecs::world& world) {
     m_GeometryPass->Execute(world, frame);
 }
 
-void RendererSystem::Shutdown() {
+void RenderPipeline::Shutdown() {
     m_GeometryPass.reset();
     m_AmbientPass.reset();
 
     m_Context.reset();
 }
 
-RenderFrame RendererSystem::BuildFrame(flecs::world& world) {
+RenderFrame RenderPipeline::BuildFrame(flecs::world& world) {
     RenderFrame frame;
 
     float aspect = static_cast<float>(m_Window->Width) / static_cast<float>(m_Window->Height);

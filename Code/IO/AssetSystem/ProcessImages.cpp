@@ -1,6 +1,6 @@
-#include "Platform/IO/AssetSystem/AssetProcessor.h"
-#include "Platform/IO/AssetSystem/Assets.h"
-#include "Platform/IO/FileSystem/File.h"
+#include "IO/AssetSystem/AssetProcessor.h"
+#include "IO/AssetSystem/Assets.h"
+#include "IO/FileSystem/File.h"
 
 #include <cstdint>
 #include <memory>

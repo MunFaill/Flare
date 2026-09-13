@@ -1,6 +1,6 @@
-#include "Platform/IO/InputSystem/Input.h"
-#include "Platform/IO/InputSystem/Keys.h"
-#include "Platform/Windowing/Window.h"
+#include "IO/InputSystem/Input.h"
+#include "IO/InputSystem/Keys.h"
+#include "IO/Windowing/Window.h"
 
 #include <GLFW/glfw3.h>
 

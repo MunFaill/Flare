@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Platform/IO/AssetSystem/AssetManager.h"
+#include "IO/AssetSystem/AssetManager.h"
 #include "Renderer/Graphics/Material.h"
 #include "Renderer/Graphics/Model.h"
 

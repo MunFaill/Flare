@@ -10,7 +10,7 @@
 
 struct Window;
 
-class RendererSystem {
+class RenderPipeline {
 public:
     void Init(Window& window);
     void Update(flecs::world& world);
