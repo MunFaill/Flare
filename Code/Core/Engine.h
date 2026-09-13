@@ -4,6 +4,7 @@
 #include "IO/InputSystem/Input.h"
 #include "IO/AssetSystem/AssetProcessor.h"
 #include "IO/FileSystem/File.h"
+#include "Physics/Physics.h"
 
 #include <memory>
 
@@ -19,4 +20,5 @@ struct EngineModules {
     std::unique_ptr<Input> InputModule;
     std::unique_ptr<AssetProcessor> AssetProcessorModule;
     std::unique_ptr<File> FileSystemModule;
+    std::unique_ptr<PhysicsFunctions> PhysicsFunctionsModule;
 };

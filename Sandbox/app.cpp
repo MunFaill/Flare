@@ -1,4 +1,5 @@
 #include "app.h"
+#include "ECS/Components.h"
 
 static flecs::entity camera;
 static flecs::entity cube;
@@ -27,11 +28,11 @@ void App::OnStart() {
 
     cube.set<TransformComponent>({{0.0f, 5.0f, 0.0f}});
     cube.set<ModelComponent>({"Cube"});
-    cube.set<CollisionComponent>({DynamicBody});
+    cube.set<CollisionComponent>({true, DynamicBody});
 
     ground.set<TransformComponent>({{0.0f, -5.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {10.0f, 1.0f, 10.0f}});
     ground.set<ModelComponent>({"Cube"});
-    ground.set<CollisionComponent>({StaticBody});
+    ground.set<CollisionComponent>({true, StaticBody});
 
     sun.set<TransformComponent>({{}, {-5.0f, -5.0f, -5.0f}});
     sun.add<DirectionalLightComponent>();
@@ -39,8 +40,10 @@ void App::OnStart() {
     ambient.set<AmbientComponent>({Sky, "SkyTexture"});
 }
 
-void App::OnUpdate(float delta)
-{
+void App::OnUpdate(float delta){
+    if (Modules->InputModule->KeyJustPressed(KEY_SPACE) && Modules->PhysicsFunctionsModule->IsOnFloor(cube)) {
+        cube.get_mut<CollisionComponent>().LinearVelocity.y += 7.0f;
+    }
 }
 
 void App::OnShutdown() {

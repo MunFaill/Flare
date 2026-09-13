@@ -28,6 +28,7 @@ void Application::Setup() {
     Modules->InputModule = std::make_unique<Input>();
     Modules->AssetProcessorModule = std::make_unique<AssetProcessor>();
     Modules->FileSystemModule = std::make_unique<File>();
+    Modules->PhysicsFunctionsModule = std::make_unique<PhysicsFunctions>();
 
     OnSetup(); // OnSetup is called once after creation and before initialization
 }
@@ -73,7 +74,7 @@ void Application::Shutdown() {
 
     Modules->InputModule.reset();
     Modules->AssetProcessorModule.reset();
-
+    Modules->PhysicsFunctionsModule.reset();
     Modules->WindowModule->Shutdown();
     Modules->WindowModule.reset();
 

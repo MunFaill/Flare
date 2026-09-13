@@ -7,3 +7,7 @@ struct Physics {
     void Update(const flecs::world& World, float DeltaTime);
     void Shutdown();
 };
+
+struct PhysicsFunctions {
+    bool IsOnFloor(const flecs::entity Entity);
+};

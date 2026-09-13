@@ -133,3 +133,44 @@ void Physics::Shutdown() {
     InternalBodies.clear();
     b3DestroyWorld(WorldID);
 }
+
+bool PhysicsFunctions::IsOnFloor(const flecs::entity Entity) {
+    if (!Entity.is_alive()) return false;
+
+    if (!Entity.has<TransformComponent>() || !Entity.has<CollisionComponent>()) {
+        return false;
+    }
+
+    const auto& TComp = Entity.get<TransformComponent>();
+
+    b3BodyId myBodyId = b3_nullBodyId;
+    for (const PhysicsBodyData& data : InternalBodies) {
+        if (data.entityId == Entity.id()) {
+            myBodyId = data.bodyId;
+            break;
+        }
+    }
+
+    if (B3_IS_NULL(myBodyId)) return false;
+
+    float halfHeight = TComp.Scale.y / 2.0f;
+    b3Vec3 origin = { TComp.Position.x, TComp.Position.y - halfHeight + 0.05f, TComp.Position.z };
+    
+    float rayDistance = 0.15f; 
+    b3Vec3 translation = { 0.0f, -rayDistance, 0.0f };
+
+    b3QueryFilter filter = b3DefaultQueryFilter();
+    b3RayResult result = b3World_CastRayClosest(WorldID, origin, translation, filter);
+
+    if (result.hit) {
+        b3BodyId hitBodyId = b3Shape_GetBody(result.shapeId);
+        
+        if (hitBodyId.index1 == myBodyId.index1) {
+            return false;
+        }
+
+        return true;
+    }
+
+    return false;
+}
