@@ -1,4 +1,4 @@
-#include "Scene/Entities/Components.h"
+#include "ECS/Components.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/ext.hpp>

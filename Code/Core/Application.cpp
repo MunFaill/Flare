@@ -16,7 +16,6 @@ void Application::Run() {
     Modules->InputModule = std::make_unique<Input>();
     Modules->AssetProcessorModule = std::make_unique<AssetProcessor>();
     Modules->FileSystemModule = std::make_unique<File>();
-    Modules->SceneModule = std::make_unique<Scene>();
 
     OnSetup(); // OnSetup is called once after creation and before initialization
     // Initialize modules
@@ -35,7 +34,7 @@ void Application::Run() {
         OnUpdate(_time.Delta);
         if (Modules->WindowModule->CloseEvent()) Running = false;
 
-        Pipeline.Update(*Modules->SceneModule);
+        Pipeline.Update(World);
         Modules->WindowModule->SwapBuffers();
     }
 
@@ -47,7 +46,6 @@ void Application::Run() {
     Assets::Shaders.Clear();
     Assets::Meshes.Clear();
 
-    Modules->SceneModule.reset();
     Modules->InputModule.reset();
     Modules->AssetProcessorModule.reset();
 

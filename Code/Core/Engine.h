@@ -4,7 +4,6 @@
 #include "Platform/IO/InputSystem/Input.h"
 #include "Platform/IO/AssetSystem/AssetProcessor.h"
 #include "Platform/IO/FileSystem/File.h"
-#include "Scene/Scene.h"
 
 #include <memory>
 
@@ -20,5 +19,4 @@ struct EngineModules {
     std::unique_ptr<Input> InputModule;
     std::unique_ptr<AssetProcessor> AssetProcessorModule;
     std::unique_ptr<File> FileSystemModule;
-    std::unique_ptr<Scene> SceneModule;
 };

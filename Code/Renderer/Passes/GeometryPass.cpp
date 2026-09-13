@@ -3,40 +3,30 @@
 
 #include "Platform/IO/AssetSystem/Assets.h"
 #include "Renderer/Device/DeviceContext.h"
-#include "Scene/Scene.h"
-#include "Scene/Entities/Components.h"
-#include "Scene/Entities/Entity.h"
+#include "ECS/Components.h"
 
 #include <algorithm>
 #include <string>
 
-GeometryPass::GeometryPass(DeviceContext& context) : m_Context(context) {
-}
+GeometryPass::GeometryPass(DeviceContext& context) : m_Context(context) {}
 
-void GeometryPass::Execute(Scene& scene, const RenderFrame& frame) {
+void GeometryPass::Execute(const flecs::world& world, const RenderFrame& frame) {
     if (!frame.HasCamera)
         return;
 
-    for (std::unique_ptr<Entity>& entity : scene.GetEntities()) {
-        if (!entity->HasComponent<TransformComponent>())
-            continue;
+    world.each([&](flecs::entity e, TransformComponent& transform, ModelComponent& model) {
+        RenderModel(e, frame);
+    });
 
-        if (entity->HasComponent<ModelComponent>()) {
-            RenderModel(*entity, frame);
-        }
-        else if (entity->HasComponent<MeshComponent>()) {
-            RenderMesh(*entity, frame);
-        }
-    }
+    world.each([&](flecs::entity e, TransformComponent& transform, MeshComponent& mesh) {
+        RenderMesh(e, frame);
+    });
 }
 
-void GeometryPass::RenderModel(Entity& entity, const RenderFrame& frame) {
-    ModelComponent* modelComponent = entity.GetComponent<ModelComponent>();
+void GeometryPass::RenderModel(flecs::entity& Entity, const RenderFrame& frame) {
+    const ModelComponent& modelComponent = Entity.get<ModelComponent>();
 
-    if (!modelComponent)
-        return;
-
-    Model* model = Assets::Models.Get(modelComponent->ModelID);
+    Model* model = Assets::Models.Get(modelComponent.ModelID);
 
     if (!model)
         return;
@@ -53,46 +43,34 @@ void GeometryPass::RenderModel(Entity& entity, const RenderFrame& frame) {
         if (!shader)
             continue;
 
-        RenderMeshPart(entity, frame, *mesh, *material, *shader);
+        RenderMeshPart(Entity, frame, *mesh, *material, *shader);
     }
 }
 
-void GeometryPass::RenderMesh(Entity& entity, const RenderFrame& frame) {
-    MeshComponent* meshComponent = entity.GetComponent<MeshComponent>();
-
-    if (!meshComponent)
+void GeometryPass::RenderMesh(flecs::entity& Entity, const RenderFrame& frame) {
+    if (!Entity.has<MeshComponent>() || !Entity.has<MaterialComponent>())
         return;
 
-    Mesh* mesh = Assets::Meshes.Get(meshComponent->MeshID);
+    const MeshComponent& meshComponent = Entity.get<MeshComponent>();
+    Mesh* mesh = Assets::Meshes.Get(meshComponent.MeshID);
+    if (!mesh) return;
 
-    if (!mesh)
-        return;
-
-    if (!entity.HasComponent<MaterialComponent>())
-        return;
-
-    MaterialComponent* materialComponent = entity.GetComponent<MaterialComponent>();
-
-    if (!materialComponent)
-        return;
-
-    Material* material = Assets::Materials.Get(materialComponent->MaterialID);
-
-    if (!material)
-        return;
+    const MaterialComponent& materialComponent = Entity.get<MaterialComponent>();
+    Material* material = Assets::Materials.Get(materialComponent.MaterialID);
+    if (!material) return;
 
     Shader* shader = Assets::Shaders.Get(material->ShaderID);
+    if (!shader) return;
 
-    if (!shader)
-        return;
+    RenderMeshPart(Entity, frame, *mesh, *material, *shader);
 
-    RenderMeshPart(entity, frame, *mesh, *material, *shader);
 }
 
-void GeometryPass::RenderMeshPart(Entity& entity, const RenderFrame& frame, Mesh& mesh, Material& material, Shader& shader) {
+void GeometryPass::RenderMeshPart(flecs::entity& Entity, const RenderFrame& frame, Mesh& mesh, Material& material, Shader& shader) {
     shader.Bind();
 
-    shader.SetMat4("u_Model", entity.GetWorldTransform());
+    const TransformComponent& transform = Entity.get<TransformComponent>();
+    shader.SetMat4("u_Model", transform.GetTransform());
 
     shader.SetMat4("u_ViewProjection", frame.Camera.ViewProjection);
 
@@ -119,12 +97,7 @@ void GeometryPass::SetupLights(Shader& shader, const RenderFrame& frame) {
 
     const int maxLights = 8;
 
-    int count = static_cast<int>(
-        std::min(
-            frame.PointLights.size(),
-            static_cast<size_t>(maxLights)
-        )
-    );
+    int count = static_cast<int>(std::min(frame.PointLights.size(), static_cast<size_t>(maxLights)));
 
     for (int i = 0; i < count; ++i) {
         const PointLightData& light = frame.PointLights[i];
@@ -151,19 +124,17 @@ void GeometryPass::SetupMaterial(Shader& shader, const Material& material) {
     shader.SetInt("material.Diffuse", 0);
     shader.SetInt("material.Specular", 1);
 
-    shader.SetVec4(
-        "material.Albedo",
-        material.Albedo
-    );
+    shader.SetVec4("material.Albedo", material.Albedo);
 
     if (Assets::Textures.Has(material.DiffuseTextureID)) {
         Assets::Textures.Get(material.DiffuseTextureID)->Bind(0);
+    } else if (Assets::Textures.Has("Default")) {
+        Assets::Textures.Get("Default")->Bind(0);
     }
 
     if (Assets::Textures.Has(material.SpecularTextureID)) {
         Assets::Textures.Get(material.SpecularTextureID)->Bind(1);
-    }
-    else if (Assets::Textures.Has("Default")) {
+    } else if (Assets::Textures.Has("Default")) {
         Assets::Textures.Get("Default")->Bind(1);
     }
 }

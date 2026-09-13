@@ -11,7 +11,7 @@ Inspired on the Urho3D engine and Hazel engine
 
 - Model importer (by Assimp);
 - Image loader (by stb);
-- Custom Entity Component;
+- ECS (by Flecs);
 - Asset manager and processor;
 - OpenGL 4.6 core and Vulkan -vulkan not yet implemented- (by Glad 2.0);
 - Windowing (by glfw);

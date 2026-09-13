@@ -5,34 +5,29 @@
 
 #include "Platform/IO/AssetSystem/Assets.h"
 #include "Renderer/Device/DeviceContext.h"
-#include "Scene/Scene.h"
-#include "Scene/Entities/Components.h"
+#include "ECS/Components.h"
 
 AmbientPass::AmbientPass(DeviceContext& context) : m_Context(context) {
 }
 
-void AmbientPass::Execute(Scene& scene, const RenderFrame& frame) {
+void AmbientPass::Execute(const flecs::world& World, const RenderFrame& frame) {
     if (!frame.HasCamera)
         return;
 
-    for (auto& entity : scene.GetEntities()) {
-        if (!entity->HasComponent<AmbientComponent>())
-            continue;
+    World.each([&](flecs::entity e, AmbientComponent& Ambient){
 
-        auto* ambient = entity->GetComponent<AmbientComponent>();
-
-        if (ambient->Type == AmbientType::Sky) {
+        if (Ambient.Type == AmbientType::Sky) {
             Shader* shaderBase = Assets::Shaders.Get("Base");
-            Shader* shader = Assets::Shaders.Get(ambient->ShaderID);
-            Texture* texture = Assets::Textures.Get(ambient->TextureID);
+            Shader* shader = Assets::Shaders.Get(Ambient.ShaderID);
+            Texture* texture = Assets::Textures.Get(Ambient.TextureID);
 
             if (!shader || !texture || !shaderBase)
-                continue;
+                return;
 
             shaderBase->Bind();
             shader->Bind();
 
-            shaderBase->SetVec3("environment.AmbientColor", ambient->AmbientColor);
+            shaderBase->SetVec3("environment.AmbientColor", Ambient.AmbientColor);
             shader->SetMat4("u_InverseProjection", glm::inverse(frame.Camera.Projection));
 
             glm::mat4 viewRotation =
@@ -40,7 +35,7 @@ void AmbientPass::Execute(Scene& scene, const RenderFrame& frame) {
 
             shader->SetMat4("u_InverseView", glm::inverse(viewRotation));
 
-            shader->SetFloat("u_Exposure", ambient->Exposure);
+            shader->SetFloat("u_Exposure", Ambient.Exposure);
 
             shader->SetInt("u_SkyTexture", 0);
 
@@ -55,11 +50,11 @@ void AmbientPass::Execute(Scene& scene, const RenderFrame& frame) {
             Shader* shader = Assets::Shaders.Get("Base");
 
             if (!shader)
-                continue;
+                return;
 
             shader->Bind();
 
-            shader->SetVec3("environment.AmbientColor", ambient->AmbientColor);
+            shader->SetVec3("environment.AmbientColor", Ambient.AmbientColor);
         };
-    }
+    });
 }

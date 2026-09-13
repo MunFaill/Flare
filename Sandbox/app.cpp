@@ -1,14 +1,11 @@
 #include "app.h"
-#include "Scene/Entities/Components.h"
 
-// Probably insecure!
-static Entity* camera;
-static Entity* cube;
-static Entity* sun;
-static Entity* ambient;
-static Entity* light;
-static Entity* light2;
-static Entity* light3;
+static flecs::entity camera;
+static flecs::entity cube;
+static flecs::entity sun;
+static flecs::entity ambient;
+
+static float rotation = 0.0f;
 
 void App::OnSetup() {
     Modules->WindowModule->Title = "Sandbox";
@@ -18,32 +15,28 @@ void App::OnStart() {
     std::vector<std::string> FilesContaienr = Modules->FileSystemModule->ScanFolder("Sandbox/Assets"); // Scan for files (Assets like images, shaders and models)
     Modules->AssetProcessorModule->Process(FilesContaienr);
 
-    camera = Modules->SceneModule->CreateEntity("Camera");
-    cube = Modules->SceneModule->CreateEntity("Cube");
-    sun = Modules->SceneModule->CreateEntity("Sun");
-    ambient = Modules->SceneModule->CreateEntity("Ambient");
-    light = Modules->SceneModule->CreateEntity("PointLight");
+    camera = World.entity("Camera");
+    cube =  World.entity("Cube");
+    sun =  World.entity("Sun");
+    ambient =  World.entity("Ambient");
 
-    camera->AddComponent<TransformComponent>().Position.z = 5.0f; // Customize parameters
-    camera->AddComponent<CameraComponent>(); // Default parameters
+    camera.set<TransformComponent>({{0.0f, 0.0f, 5.0f}}); // Customize parameters
+    camera.add<CameraComponent>(); // Default parameters
 
-    cube->AddComponent<TransformComponent>();
-    cube->AddComponent<ModelComponent>().ModelID = "Cube";
+    cube.add<TransformComponent>();
+    cube.set<ModelComponent>({"Cube"});
 
-    sun->AddComponent<TransformComponent>().Rotation = {-5.0f, -5.0f, -5.0f};
-    sun->AddComponent<DirectionalLightComponent>();
+    sun.set<TransformComponent>({{}, {-5.0f, -5.0f, -5.0f}});
+    sun.add<DirectionalLightComponent>();
 
-    ambient->AddComponent<AmbientComponent>().TextureID = "SkyTexture";
-    ambient->GetComponent<AmbientComponent>()->Type = Sky; // Use a sky texture, default is color (Ambient Color)
-
-    light->AddComponent<TransformComponent>().Position = {1.0f, -1.0f, 2.0f};
-    light->AddComponent<PointLightComponent>().LightColor = {1.0f, 0.0f, 0.0f};
+    ambient.set<AmbientComponent>({Sky, "SkyTexture"});
 }
 
-void App::OnUpdate(float delta) {
-    cube->GetComponent<TransformComponent>()->Rotation.x += 50.0f * delta;
-    cube->GetComponent<TransformComponent>()->Rotation.y += 50.0f * delta;
-    cube->GetComponent<TransformComponent>()->Rotation.z += 50.0f * delta;
+void App::OnUpdate(float delta)
+{
+    rotation += 50.0f * delta;
+
+    cube.set<TransformComponent>({{}, {rotation, rotation, rotation}});
 }
 
 void App::OnShutdown() {

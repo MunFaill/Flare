@@ -64,7 +64,7 @@ target_link_libraries(Flare PUBLIC glfw)
 target_link_libraries(Flare PUBLIC glm::glm)
 target_link_libraries(Flare PUBLIC box3d::box3d)
 target_link_libraries(Flare PUBLIC assimp::assimp)
-target_link_libraries(Flare PUBLIC flecs::${TARGET})
+target_link_libraries(Flare PUBLIC flecs)
 
 #Sandbox
 

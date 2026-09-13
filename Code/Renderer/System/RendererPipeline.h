@@ -6,18 +6,18 @@
 #include "Renderer/Passes/GeometryPass.h"
 
 #include <memory>
+#include <flecs.h>
 
 struct Window;
-class Scene;
 
 class RendererSystem {
 public:
     void Init(Window& window);
-    void Update(Scene& scene);
+    void Update(flecs::world& world);
     void Shutdown();
 
 private:
-    RenderFrame BuildFrame(Scene& scene);
+    RenderFrame BuildFrame(flecs::world& world);
 
 private:
     std::unique_ptr<DeviceContext> m_Context;

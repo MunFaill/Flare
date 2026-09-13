@@ -5,8 +5,7 @@
 #include <glm/trigonometric.hpp>
 
 #include "Platform/Windowing/Window.h"
-#include "Scene/Entities/Components.h"
-#include "Scene/Scene.h"
+#include "ECS/Components.h"
 
 void RendererSystem::Init(Window& window) {
     m_Context = DeviceContext::Create();
@@ -25,13 +24,13 @@ void RendererSystem::Init(Window& window) {
         std::make_unique<GeometryPass>(*m_Context);
 }
 
-void RendererSystem::Update(Scene& scene) {
-    RenderFrame frame = BuildFrame(scene);
+void RendererSystem::Update(flecs::world& world) {
+    RenderFrame frame = BuildFrame(world);
 
     m_Context->Clear({0.0f, 0.0f, 0.0f, 1.0f});
 
-    m_AmbientPass->Execute(scene, frame);
-    m_GeometryPass->Execute(scene, frame);
+    m_AmbientPass->Execute(world, frame);
+    m_GeometryPass->Execute(world, frame);
 }
 
 void RendererSystem::Shutdown() {
@@ -41,88 +40,58 @@ void RendererSystem::Shutdown() {
     m_Context.reset();
 }
 
-RenderFrame RendererSystem::BuildFrame(Scene& scene) {
+RenderFrame RendererSystem::BuildFrame(flecs::world& world) {
     RenderFrame frame;
 
     float aspect = static_cast<float>(m_Window->Width) / static_cast<float>(m_Window->Height);
 
     // Camera
-    for (auto& entity : scene.GetEntities()) {
-        if (!entity->HasComponent<CameraComponent>() ||
-            !entity->HasComponent<TransformComponent>()) {
-            continue;
-        }
+    world.each([&](flecs::entity e, TransformComponent& Transform, CameraComponent& Camera) {
 
-        CameraComponent* camera = entity->GetComponent<CameraComponent>();
+        frame.Camera.Position = glm::vec3(Transform.GetTransform()[3]);
 
-        glm::mat4 world = entity->GetWorldTransform();
+        frame.Camera.View = glm::inverse(Transform.GetTransform());
 
-        frame.Camera.Position = glm::vec3(world[3]);
-
-        frame.Camera.View = glm::inverse(world);
-
-        frame.Camera.Projection = glm::perspective(     glm::radians(camera->FOV), aspect, camera->Near, camera->Far);
+        frame.Camera.Projection = glm::perspective(glm::radians(Camera.FOV), aspect, Camera.Near, Camera.Far);
 
         frame.Camera.ViewProjection = frame.Camera.Projection * frame.Camera.View;
 
-        frame.Camera.FOV = camera->FOV;
-        frame.Camera.Near = camera->Near;
-        frame.Camera.Far = camera->Far;
+        frame.Camera.FOV = Camera.FOV;
+        frame.Camera.Near = Camera.Near;
+        frame.Camera.Far = Camera.Far;
 
         frame.HasCamera = true;
-
-        break;
-    }
+    });
 
     // Directional Light
-    for (auto& entity : scene.GetEntities()) {
-        if (!entity->HasComponent<DirectionalLightComponent>() ||
-            !entity->HasComponent<TransformComponent>()) {
-            continue;
-        }
+    world.each([&](flecs::entity e, TransformComponent& Transform, DirectionalLightComponent& Light) {
+        frame.DirectionalLight.Direction = Transform.Rotation;
 
-        TransformComponent* transform = entity->GetComponent<TransformComponent>();
+        frame.DirectionalLight.Color = Light.LightColor;
 
-        DirectionalLightComponent* light = entity->GetComponent<DirectionalLightComponent>();
-
-        frame.DirectionalLight.Direction = transform->Rotation;
-
-        frame.DirectionalLight.Color = light->LightColor;
-
-        frame.DirectionalLight.Specular = light->Specular;
+        frame.DirectionalLight.Specular = Light.Specular;
 
         frame.HasDirectionalLight = true;
-
-        break;
-    }
+    });
 
     // Point Lights
-    for (auto& entity : scene.GetEntities()) {
-        if (!entity->HasComponent<PointLightComponent>() ||
-            !entity->HasComponent<TransformComponent>()) {
-            continue;
-        }
-
+    world.each([&](flecs::entity e, TransformComponent& Transform, PointLightComponent& Light) {
         if (frame.PointLights.size() >= 8)
-            break;
-
-        TransformComponent* transform = entity->GetComponent<TransformComponent>();
-
-        PointLightComponent* light = entity->GetComponent<PointLightComponent>();
+            return;
 
         PointLightData data;
 
-        data.Position = glm::vec3(entity->GetWorldTransform()[3]);
+        data.Position = glm::vec3(Transform.GetTransform()[3]);
 
-        data.Color = light->LightColor;
-        data.Specular = light->Specular;
+        data.Color = Light.LightColor;
+        data.Specular = Light.Specular;
 
-        data.Constant = light->Constant;
-        data.Linear = light->Linear;
-        data.Quadratic = light->Quadratic;
+        data.Constant = Light.Constant;
+        data.Linear = Light.Linear;
+        data.Quadratic = Light.Quadratic;
 
         frame.PointLights.push_back(data);
-    }
+    });
 
     return frame;
 }

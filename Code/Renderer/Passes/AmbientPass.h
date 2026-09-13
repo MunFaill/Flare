@@ -8,7 +8,7 @@ class AmbientPass : public RenderPass {
 public:
     explicit AmbientPass(DeviceContext& context);
 
-    void Execute(Scene& scene, const RenderFrame& frame) override;
+    void Execute(const flecs::world& World, const RenderFrame& frame) override;
 
 private:
     DeviceContext& m_Context;

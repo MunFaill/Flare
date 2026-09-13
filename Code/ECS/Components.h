@@ -36,11 +36,11 @@ struct CameraComponent {
 };
 
 struct AmbientComponent {
-    glm::vec3 AmbientColor{1.0f};
-    float Exposure = 1.0f;
+    AmbientType Type = Color;
     std::string TextureID = "SkyTexture";
     std::string ShaderID = "Sky";
-    AmbientType Type = Color;
+    glm::vec3 AmbientColor{1.0f};
+    float Exposure = 1.0f;
 };
 
 struct DirectionalLightComponent {
