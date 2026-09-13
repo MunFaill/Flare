@@ -41,6 +41,10 @@ set(ASSIMP_BUILD_FBX_IMPORTER TRUE CACHE BOOL "" FORCE)
 
 add_subdirectory(Vendor/Assimp)
 
+# Flecs
+
+add_subdirectory(Vendor/Flecs)
+
 # Flare
 
 file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS
@@ -60,6 +64,7 @@ target_link_libraries(Flare PUBLIC glfw)
 target_link_libraries(Flare PUBLIC glm::glm)
 target_link_libraries(Flare PUBLIC box3d::box3d)
 target_link_libraries(Flare PUBLIC assimp::assimp)
+target_link_libraries(Flare PUBLIC flecs::${TARGET})
 
 #Sandbox
 

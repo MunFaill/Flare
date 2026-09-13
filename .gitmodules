@@ -10,3 +10,6 @@
 [submodule "Vendor/Assimp"]
 	path = Vendor/Assimp
 	url = https://github.com/assimp/assimp.git
+[submodule "Vendor/Flecs"]
+	path = Vendor/Flecs
+	url = https://github.com/SanderMertens/flecs.git
