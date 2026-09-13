@@ -68,10 +68,14 @@ struct PointLightComponent {
 };
 
 struct CollisionComponent {
+    bool Enabled = true;
     PhysicsType BodyType = StaticBody;
     ShapeType CollisonShape = BoxShape;
     glm::vec3 LinearForce{0.0f};
     glm::vec3 LinearVelocity{0.0f};
     float Density = 1.0f;
     float Friction = 0.3f;
+    bool LockAngularX = false;
+    bool LockAngularY = false;
+    bool LockAngularZ = false;
 };

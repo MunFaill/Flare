@@ -28,51 +28,60 @@ void Physics::Initialize(const flecs::world& World) {
     InternalBodies.clear();
 
     World.each([&](flecs::entity e, TransformComponent& Transform, CollisionComponent& Collision) {
-        b3BodyDef BoxCollision = b3DefaultBodyDef();
+        if (Collision.Enabled) {
+            b3BodyDef BoxCollision = b3DefaultBodyDef();
 
-        switch (Collision.BodyType) {
-            case StaticBody:
-                BoxCollision.type = b3_staticBody;
-                break;
+            switch (Collision.BodyType) {
+                case StaticBody:
+                    BoxCollision.type = b3_staticBody;
+                    break;
 
-            case DynamicBody:
-                BoxCollision.type = b3_dynamicBody;
-                break;
+                case DynamicBody:
+                    BoxCollision.type = b3_dynamicBody;
+                    break;
 
-            case KinematicBody:
-                BoxCollision.type = b3_kinematicBody;
-                break;
+                case KinematicBody:
+                    BoxCollision.type = b3_kinematicBody;
+                    break;
+            }
+
+            b3MotionLocks locks = {0};
+            locks.angularX = Collision.LockAngularX;
+            locks.angularY = Collision.LockAngularY;
+            locks.angularZ = Collision.LockAngularZ;
+            BoxCollision.motionLocks = locks;
+
+            // Position
+            BoxCollision.position = {Transform.Position.x, Transform.Position.y, Transform.Position.z};
+
+            // Rotation
+            glm::mat4 rotMat = glm::yawPitchRoll(glm::radians(Transform.Rotation.y), glm::radians(Transform.Rotation.x), glm::radians(Transform.Rotation.z));
+            glm::quat rotation = glm::quat_cast(rotMat);
+
+            BoxCollision.rotation = {rotation.x, rotation.y, rotation.z, rotation.w};
+
+            // Body
+            b3BodyId BoxCollisionID = b3CreateBody(WorldID, &BoxCollision);
+
+            switch (Collision.CollisonShape) {
+                case BoxShape:
+                    b3BoxHull BoxCollisionShape = b3MakeBoxHull(Transform.Scale.x / 2, Transform.Scale.y / 2, Transform.Scale.z / 2);
+                    b3ShapeDef BoxCollisionShapeDef = b3DefaultShapeDef();
+                    BoxCollisionShapeDef.density = Collision.Density;
+                    BoxCollisionShapeDef.baseMaterial.friction = Collision.Friction;
+                    b3CreateHullShape(BoxCollisionID, &BoxCollisionShapeDef, &BoxCollisionShape.base);
+                    break;
+            }
+
+            InternalBodies.push_back({e.id(), BoxCollisionID});
         }
-
-        // Position
-        BoxCollision.position = {Transform.Position.x, Transform.Position.y, Transform.Position.z};
-
-        // Rotation
-        glm::mat4 rotMat = glm::yawPitchRoll(glm::radians(Transform.Rotation.y), glm::radians(Transform.Rotation.x), glm::radians(Transform.Rotation.z));
-        glm::quat rotation = glm::quat_cast(rotMat);
-
-        BoxCollision.rotation = {rotation.x, rotation.y, rotation.z, rotation.w};
-
-        // Body
-        b3BodyId BoxCollisionID = b3CreateBody(WorldID, &BoxCollision);
-
-        switch (Collision.CollisonShape) {
-            case BoxShape:
-                b3BoxHull BoxCollisionShape = b3MakeBoxHull(Transform.Scale.x / 2, Transform.Scale.y / 2, Transform.Scale.z / 2);
-                b3ShapeDef BoxCollisionShapeDef = b3DefaultShapeDef();
-                BoxCollisionShapeDef.density = Collision.Density;
-                BoxCollisionShapeDef.baseMaterial.friction = Collision.Friction;
-                b3CreateHullShape(BoxCollisionID, &BoxCollisionShapeDef, &BoxCollisionShape.base);
-                break;
-        }
-
-        InternalBodies.push_back({e.id(), BoxCollisionID});
     });
 
     std::println(
         "Physics initialized with {} bodies",
         InternalBodies.size()
     );
+    
 }
 
 void Physics::Update(const flecs::world& World, float DeltaTime) {
