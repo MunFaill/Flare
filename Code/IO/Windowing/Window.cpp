@@ -1,42 +1,11 @@
 #include "IO/Windowing/Window.h"
+#include "IO/Windowing/WindowBackend.h"
+#include "IO/Windowing/GLFW/GLFWWindow.h"
 
-#include <GLFW/glfw3.h>
-#include <print>
-
-void Window::Init() {
-    Handle = glfwCreateWindow(Width, Height, Title.c_str(), nullptr, nullptr);
-    if (!Handle) {
-        std::println("Error creating window, null handle");
-    } else {
-        std::println("Window successfully created");
+std::unique_ptr<Window> Window::Create() {
+    switch (WindowBackend::CurrentAPI) {
+        case WindowAPI::None: return nullptr; break;
+        case WindowAPI::GLFW: return std::make_unique<GLFWWindow>(); break;
     }
-}
-
-void Window::Shutdown() {
-    std::println("Window shutdown");
-    glfwDestroyWindow(Handle);
-}
-
-void Window::SwapBuffers() {
-    glfwSwapBuffers(Handle);
-    glfwPollEvents();
-}
-
-void Window::Resizable(bool state) {
-    if (Handle) {
-        if (state) glfwSetWindowAttrib(Handle, GLFW_RESIZABLE, GLFW_TRUE);
-        else glfwSetWindowAttrib(Handle, GLFW_RESIZABLE, GLFW_FALSE);
-    }
-}
-
-void Window::VSync(bool state) {
-    if (Handle) {
-        if (state) glfwSwapInterval(1);
-        else glfwSwapInterval(0);
-    }
-}
-
-bool Window::CloseEvent() {
-    if (glfwWindowShouldClose(Handle)) return true;
-    return false;
+    return nullptr;
 }

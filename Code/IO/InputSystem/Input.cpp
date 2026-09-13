@@ -5,7 +5,7 @@
 #include <GLFW/glfw3.h>
 
 void Input::Initialize(Window& window) {
-    m_WindowHandle = window.Handle;
+    m_WindowHandle = static_cast<GLFWwindow*>(window.GetHandle());
 }
 
 void Input::Update() {

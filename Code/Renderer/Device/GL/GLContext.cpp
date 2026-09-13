@@ -26,15 +26,15 @@ void GLContext::Initialize(Window& window) {
     #endif
     std::println("GL context configured");
 
-    glfwMakeContextCurrent(window.Handle);
-    glfwSetWindowUserPointer(window.Handle, &window);
+    glfwMakeContextCurrent(static_cast<GLFWwindow*>(window.GetHandle()));
+    glfwSetWindowUserPointer(static_cast<GLFWwindow*>(window.GetHandle()), &window);
 
     if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
         std::println("Error to load GLAD");
         window.Shutdown();
     }
 
-    glfwSetFramebufferSizeCallback(window.Handle, framebuffer_size_callback);
+    glfwSetFramebufferSizeCallback(static_cast<GLFWwindow*>(window.GetHandle()), framebuffer_size_callback);
 
     glDepthFunc(GL_LESS);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

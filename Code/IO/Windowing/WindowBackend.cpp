@@ -1,24 +1,16 @@
 #include "IO/Windowing/WindowBackend.h"
-
-#include <GLFW/glfw3.h>
-#include <print>
+#include "IO/Windowing/GLFW/GLFWBackend.h"
 
 void WindowBackend::Init() {
-    std::println("Initializing window backend");
-    if (!glfwInit()) {
-        std::println("Error: Unable to initialize window backend");
-    } else {
-        std::println("Window backend initialized with success");
+    switch (CurrentAPI) {
+        case WindowAPI::None: return; break;
+        case WindowAPI::GLFW: return GLFWWindowBackend::Init();
     }
 }
 
 void WindowBackend::Shutdown() {
-    std::println("Warning: Window backend shutdown");
-    glfwTerminate();
-}
-
-void WindowBackend::Reset() {
-    std::println("Reseting window backend, it might cause crashes");
-    Shutdown();
-    Init();
+    switch (CurrentAPI) {
+        case WindowAPI::None: return; break;
+        case WindowAPI::GLFW: return GLFWWindowBackend::Shutdown();
+    }
 }

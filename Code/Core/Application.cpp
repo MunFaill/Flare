@@ -22,7 +22,7 @@ void Application::Setup() {
     Modules = std::make_unique<EngineModules>();
     _time.Init();
 
-    Modules->WindowModule = std::make_unique<Window>();
+    Modules->WindowModule = Window::Create();
     Modules->InputModule = std::make_unique<Input>();
     Modules->AssetProcessorModule = std::make_unique<AssetProcessor>();
     Modules->FileSystemModule = std::make_unique<File>();
