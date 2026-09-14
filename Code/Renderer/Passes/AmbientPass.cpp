@@ -16,7 +16,7 @@ void AmbientPass::Execute(const flecs::world& World, const RenderFrame& frame) {
     World.each([&](flecs::entity e, AmbientComponent& Ambient){
 
         if (Ambient.Type == AmbientType::Sky) {
-            Shader* shaderBase = Assets::Shaders.Get("Base");
+            Shader* shaderBase = Assets::Shaders.Get("Geometry");
             Shader* shader = Assets::Shaders.Get(Ambient.ShaderID);
             Texture* texture = Assets::Textures.Get(Ambient.TextureID);
 
@@ -46,7 +46,7 @@ void AmbientPass::Execute(const flecs::world& World, const RenderFrame& frame) {
 
             m_Context.SetBlendFuncLess();
         } else {
-            Shader* shader = Assets::Shaders.Get("Base");
+            Shader* shader = Assets::Shaders.Get("Geometry");
 
             if (!shader)
                 return;

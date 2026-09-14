@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 
 struct Material {
-    std::string ShaderID = "Base";
+    std::string ShaderID = "Geometry";
     std::string DiffuseTextureID = "DefaultDiffuse";
     std::string SpecularTextureID = "DefaultSpecular";
     glm::vec4 Albedo{1.0f};
