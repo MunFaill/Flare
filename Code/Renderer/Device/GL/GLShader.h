@@ -12,6 +12,8 @@ class GLShader : public Shader {
         void Bind() override;
         void Unbind() override;
         void SendData(const char* VertexShaderSource, const char* FragmentShaderSource) override;
+        void SendComputeData(const char* ComputeShaderSource) override;
+
         void SetInt(const std::string& name, const int& value) override;
         void SetFloat(const std::string& name, const float& value) override;
         void SetVec2(const std::string& name, const glm::vec2& value) override;
@@ -19,8 +21,9 @@ class GLShader : public Shader {
         void SetVec4(const std::string& name, const glm::vec4& value) override;
         void SetMat4(const std::string& name, const glm::mat4& value) override;
 	private:
-		uint32_t VS = 0;
-		uint32_t FS = 0;
-		uint32_t SP = 0;
+		uint32_t VS  = 0;
+		uint32_t FS  = 0;
+        uint32_t CS  = 0;
+		uint32_t SP  = 0;
 };
 

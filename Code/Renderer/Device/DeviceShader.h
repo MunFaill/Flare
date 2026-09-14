@@ -11,6 +11,7 @@ class Shader {
         virtual void Bind() = 0;
         virtual void Unbind() = 0;
         virtual void SendData(const char* VertexShaderSource, const char* FragmentShaderSource) = 0;
+        virtual void SendComputeData(const char* ComputeShaderSource) = 0;
 
         virtual void SetInt(const std::string& name, const int& value) = 0;
         virtual void SetFloat(const std::string& name, const float& value) = 0;

@@ -7,7 +7,7 @@
 #include <print>
 
 enum class ShaderType {
-    None = -1, Vertex = 0, Fragment = 1
+    None = -1, Vertex = 0, Fragment = 1, Compute = 2
 };
 
 
@@ -43,6 +43,7 @@ void AssetProcessor::ProcessShaders(const std::string& File) {
 
     std::string VertexSource;
     std::string FragmentSource;
+    std::string ComputeSource;
 
     std::stringstream ss(Source);
     std::string Line;
@@ -57,6 +58,10 @@ void AssetProcessor::ProcessShaders(const std::string& File) {
             CurrentType = ShaderType::Fragment;
         }
 
+        else if (Line.find("#[COMPUTE]") != std::string::npos) {
+            CurrentType = ShaderType::Compute;
+        }
+
         else if (CurrentType != ShaderType::None) {
             if (CurrentType == ShaderType::Vertex) {
                 VertexSource += Line + "\n";
@@ -64,6 +69,10 @@ void AssetProcessor::ProcessShaders(const std::string& File) {
 
             else if (CurrentType == ShaderType::Fragment) {
                 FragmentSource += Line + "\n";
+            }
+
+            else if (CurrentType == ShaderType::Compute) {
+                ComputeSource += Line + "\n";
             }
         }
 
@@ -74,5 +83,8 @@ void AssetProcessor::ProcessShaders(const std::string& File) {
 
     std::unique_ptr<Shader> shader = Shader::Create();
     shader->SendData(VertexSource.c_str(), FragmentSource.c_str());
+    if (!ComputeSource.empty()) {
+        shader->SendComputeData(ComputeSource.c_str());
+    }
     Assets::Shaders.Add(File::GetFileName(File), std::move(shader));
 }

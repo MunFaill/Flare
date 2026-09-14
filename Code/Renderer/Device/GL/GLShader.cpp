@@ -7,17 +7,19 @@
 GLShader::GLShader() {
 	VS = glCreateShader(GL_VERTEX_SHADER);
 	FS = glCreateShader(GL_FRAGMENT_SHADER);
+	CS = glCreateShader(GL_COMPUTE_SHADER);
 	SP = glCreateProgram();
-	std::println("Vertex shader: {}, Fragment shader: {} and Shader program: {} created", VS, FS, SP);
+	std::println("Vertex shader: {}, Fragment shader: {}, Compute shader: {} and Shader program: {} created", VS, FS, CS, SP);
 }
 
 GLShader::~GLShader() {
 	std::println("Shader program deleted: {}", SP);
 	glDeleteProgram(SP);
 	if (VS && FS) {
-		std::println("Vertex shader deleted: {} | Fragment shader deleted: {}", VS, FS);
+		std::println("Vertex shader deleted: {} | Fragment shader deleted: {} | Compute shader deleted: {}", VS, FS, CS);
 		glDeleteShader(VS);
 		glDeleteShader(FS);
+		glDeleteShader(CS);
 	}
 }
 
@@ -32,6 +34,7 @@ void GLShader::Unbind() {
 void GLShader::SendData(const char* VertexShaderSource, const char* FragmentShaderSource) {
 	int success;
 	char infoLog[512];
+
 	// Vertex shader
 	glShaderSource(VS, 1, &VertexShaderSource, nullptr);
 	glCompileShader(VS);
@@ -59,6 +62,27 @@ void GLShader::SendData(const char* VertexShaderSource, const char* FragmentShad
 	}
 	glDeleteShader(VS);
 	glDeleteShader(FS);
+}
+
+void GLShader::SendComputeData(const char* ComputeShaderSource) {
+	int success;
+	char infoLog[512];
+
+	glShaderSource(CS, 1, &ComputeShaderSource, nullptr);
+	glCompileShader(CS);
+	glGetShaderiv(CS, GL_COMPILE_STATUS, &success);
+	if (!success) {
+		glGetShaderInfoLog(VS, 512, nullptr, infoLog);
+		std::println("Compute shader error: {}", infoLog);
+	}
+	glAttachShader(CS, SP);
+	glLinkProgram(SP);
+	glGetProgramiv(SP, GL_LINK_STATUS, &success);
+	if(!success) {
+		glGetProgramInfoLog(SP, 512, nullptr, infoLog);
+		std::println("Shader program error: {}", infoLog);
+	}
+	glDeleteShader(CS);
 }
 
 void GLShader::SetInt(const std::string& name, const int& value) {
