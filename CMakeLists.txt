@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(Flare VERSION 0.0.1 LANGUAGES CXX)
+project(Flare VERSION 0.1.0 LANGUAGES CXX)
 
 # Build configuration options
 option(FLARE_BUILD_SANDBOX "Build the Sandbox executable" ON)
