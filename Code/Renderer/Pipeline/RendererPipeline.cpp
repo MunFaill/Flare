@@ -2,6 +2,7 @@
 #include "Renderer/Frames/RendererFrame.h"
 
 #include <glm/ext/matrix_clip_space.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/trigonometric.hpp>
 
 #include "IO/Windowing/Window.h"
@@ -57,7 +58,13 @@ RenderFrame RenderPipeline::BuildFrame(flecs::world& world) {
 
         frame.Camera.View = glm::inverse(Transform.GetLocalTransform());
 
-        frame.Camera.Projection = glm::perspective(glm::radians(Camera.FOV), aspect, Camera.Near, Camera.Far);
+        switch (Camera.Type) {
+            case Perspective:
+                frame.Camera.Projection = glm::perspective(glm::radians(Camera.FOV), aspect, Camera.Near, Camera.Far);
+                break;
+            case Orthogonal:
+                frame.Camera.Projection = glm::ortho(0.0f, static_cast<float>(m_Window->Width), 0.0f, static_cast<float>(m_Window->Height));
+        }
 
         frame.Camera.ViewProjection = frame.Camera.Projection * frame.Camera.View;
 

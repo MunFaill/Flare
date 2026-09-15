@@ -14,6 +14,11 @@ enum PhysicsType {
     KinematicBody = 2
 };
 
+enum CameraType {
+    Perspective = 0,
+    Orthogonal = 1
+};
+
 enum ShapeType {
     BoxShape = 0
 };
@@ -39,6 +44,7 @@ struct ModelComponent {
 };
 
 struct CameraComponent {
+    CameraType Type = Perspective;
     float FOV = 60.0f;
     float Near = 0.1f;
     float Far = 1000.0f;
