@@ -20,6 +20,7 @@ void Time::Update() {
     std::chrono::duration<float> Elapsed = Current - Last;
 
     Delta = Elapsed.count();
+    FPS = 1.0 / Delta;
 
     Last = Current;
 }

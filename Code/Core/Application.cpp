@@ -52,7 +52,7 @@ void Application::Update() {
         
         Modules->InputModule->Update();
         
-        OnUpdate(_Time.Delta);
+        OnUpdate(_Time.Delta, _Time.FPS);
         if (Modules->WindowModule->CloseEvent()) Running = false;
 
         _Physics.Update(World, _Time.Delta);

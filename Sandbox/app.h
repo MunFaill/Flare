@@ -7,6 +7,6 @@ class App : public Application {
 
         void OnSetup() override;
         void OnStart() override;
-        void OnUpdate(float delta) override;
+        void OnUpdate(float DeltaTime, float FramesPerSecond) override;
         void OnShutdown() override;
 };

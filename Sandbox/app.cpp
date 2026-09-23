@@ -43,7 +43,7 @@ void App::OnStart() {
     postProcess.add<PostProcessComponent>();
 }
 
-void App::OnUpdate(float delta){
+void App::OnUpdate(float DeltaTime, float FramesPerSecond){
     if (Modules->InputModule->KeyJustPressed(KEY_SPACE) && Modules->PhysicsFunctionsModule->IsOnFloor(cube)) {
         cube.get_mut<CollisionComponent>().LinearVelocity.y += 7.0f;
     }

@@ -2,6 +2,7 @@
 
 struct Time {
     float Delta;
+    float FPS;
     void Init();
     void Update();
 };

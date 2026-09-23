@@ -12,7 +12,7 @@ class Application {
 
         virtual void OnSetup() = 0;
         virtual void OnStart() = 0;
-        virtual void OnUpdate(float DeltaTime) = 0;
+        virtual void OnUpdate(float DeltaTime, float FramesPerSecond) = 0;
         virtual void OnShutdown() = 0;
         flecs::world World;
     protected:
