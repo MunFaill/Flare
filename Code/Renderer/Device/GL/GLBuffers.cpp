@@ -88,9 +88,7 @@ void GLFrameBuffer::Unbind() {
 
 void GLFrameBuffer::AttachTexture(uint32_t& Texture) {
     this->Bind();
-
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Texture, 0);
-
     this->Unbind();
 }
 
@@ -123,5 +121,7 @@ void GLRenderBuffer::SendData(uint16_t Width, uint16_t Height) {
 }
 
 void GLRenderBuffer::Attach() {
+    this->Bind();
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
+    this->Unbind();
 }
