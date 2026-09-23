@@ -49,10 +49,10 @@ void GLContext::DrawIndices(uint32_t IndexCount) {
     glDrawElements(GL_TRIANGLES, IndexCount, GL_UNSIGNED_INT, nullptr);
 }
 
-void GLContext::SetBlendFuncLess() {
+void GLContext::SetDepthFuncLess() {
     glDepthFunc(GL_LESS);
 }
-void GLContext::SetBlendFuncLEqual() {
+void GLContext::SetDepthFuncLEqual() {
     glDepthFunc(GL_LEQUAL);
 }
 

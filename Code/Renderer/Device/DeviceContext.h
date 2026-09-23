@@ -17,8 +17,8 @@ class DeviceContext {
         virtual void Initialize(Window& window) = 0;
         virtual void DrawArrays(int x) = 0;
         virtual void DrawIndices(uint32_t IndexCount) = 0;
-        virtual void SetBlendFuncLess() = 0;
-        virtual void SetBlendFuncLEqual() = 0;
+        virtual void SetDepthFuncLess() = 0;
+        virtual void SetDepthFuncLEqual() = 0;
         virtual void DepthTest(bool State) = 0;
         virtual void CullFaces(bool State) = 0;
         virtual void Blend(bool State) = 0;
