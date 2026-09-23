@@ -12,6 +12,7 @@ class Texture {
     virtual void SendData(unsigned char* data, uint32_t Width, uint32_t Height) = 0;
     virtual void Mipmaps(bool state) = 0;
     virtual void Repeat(bool state) = 0;
+    virtual void ClampToEdge(bool state) = 0;
     virtual uint32_t GetSlot() = 0;
 
     static std::unique_ptr<Texture> Create();

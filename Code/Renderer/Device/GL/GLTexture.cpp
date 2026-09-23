@@ -53,3 +53,12 @@ void GLTexture::Repeat(bool state) {
         this->Unbind();
     }
 }
+
+void GLTexture::ClampToEdge(bool state) {
+    if (state) {
+        this->Bind(LocalSlot);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        this->Unbind();
+    }
+}
