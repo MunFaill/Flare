@@ -1,4 +1,6 @@
 #include "Renderer/Pipeline/RendererPipeline.h"
+#include "Renderer/Device/DeviceBuffers.h"
+#include "Renderer/Device/DeviceTexture.h"
 #include "Renderer/Frames/RendererFrame.h"
 
 #include <glm/ext/matrix_clip_space.hpp>
@@ -7,6 +9,13 @@
 
 #include "IO/Windowing/Window.h"
 #include "ECS/Components.h"
+
+static std::unique_ptr<Texture> PostPorcessTextureObj;
+static std::unique_ptr<FrameBuffer> FrameBufferObj;
+static std::unique_ptr<RenderBuffer> RenderBufferObj;
+
+static uint32_t m_RenderWidth = 0;
+static uint32_t m_RenderHeight = 0;
 
 void RenderPipeline::Init(Window& window) {
     m_Context = DeviceContext::Create();
@@ -18,25 +27,62 @@ void RenderPipeline::Init(Window& window) {
 
     m_Window = &window;
 
-    m_AmbientPass =
-        std::make_unique<AmbientPass>(*m_Context);
+    // Create the Frame Buffer texture
+    PostPorcessTextureObj = Texture::Create();
+    PostPorcessTextureObj->ClampToEdge(true); // Avoid texture leak
 
-    m_GeometryPass =
-        std::make_unique<GeometryPass>(*m_Context);
+    // Create and configure Frame Buffer
+    FrameBufferObj = FrameBuffer::Create();
+    FrameBufferObj->AttachTexture(PostPorcessTextureObj->GetID());
+    FrameBufferObj->Bind();
+
+    // Render Buffer (Depth Test etc...)
+    RenderBufferObj = RenderBuffer::Create();
+    RenderBufferObj->Attach();
+
+    RenderBufferObj->Unbind();
+
+    m_AmbientPass = std::make_unique<AmbientPass>(*m_Context);
+    m_GeometryPass = std::make_unique<GeometryPass>(*m_Context);
+    m_PostProcessPass = std::make_unique<PostProcessPass>(*m_Context);
 }
 
 void RenderPipeline::Update(flecs::world& world) {
+
+    if (m_RenderWidth != m_Window->Width || m_RenderHeight != m_Window->Height) {
+        m_RenderWidth = m_Window->Width;
+        m_RenderHeight = m_Window->Height;
+
+        PostPorcessTextureObj->SendData(nullptr, m_RenderWidth, m_RenderHeight);
+
+        RenderBufferObj->SendData(m_RenderWidth, m_RenderHeight);
+    }
+
     RenderFrame frame = BuildFrame(world);
 
+    FrameBufferObj->Bind();
+
     m_Context->Clear({0.0f, 0.0f, 0.0f, 1.0f});
+    m_Context->DepthTest(true);
+    m_Context->CullFaces(true);
 
     m_AmbientPass->Execute(world, frame);
     m_GeometryPass->Execute(world, frame);
+
+    FrameBufferObj->Unbind();
+    m_Context->DepthTest(false);
+    m_Context->CullFaces(false);
+    PostPorcessTextureObj->Bind(0);
+    m_PostProcessPass->Execute(world, frame);
 }
 
 void RenderPipeline::Shutdown() {
-    m_GeometryPass.reset();
     m_AmbientPass.reset();
+    m_GeometryPass.reset();
+    m_PostProcessPass.reset();
+    PostPorcessTextureObj.reset();
+    FrameBufferObj.reset();
+    RenderBufferObj.reset();
 
     m_Context.reset();
 }

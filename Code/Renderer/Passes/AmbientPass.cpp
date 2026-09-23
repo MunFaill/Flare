@@ -41,9 +41,7 @@ void AmbientPass::Execute(const flecs::world& World, const RenderFrame& frame) {
             texture->Bind(0);
 
             m_Context.SetDepthFuncLEqual();
-
             m_Context.DrawArrays(3);
-
             m_Context.SetDepthFuncLess();
         } else {
             Shader* shader = Assets::Shaders.Get("Geometry");

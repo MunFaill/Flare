@@ -86,7 +86,7 @@ void GLFrameBuffer::Unbind() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void GLFrameBuffer::AttachTexture(uint32_t& Texture) {
+void GLFrameBuffer::AttachTexture(uint32_t Texture) {
     this->Bind();
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Texture, 0);
     this->Unbind();

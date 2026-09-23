@@ -42,7 +42,7 @@ class FrameBuffer {
 
         virtual void Bind() = 0;
         virtual void Unbind() = 0;
-        virtual void AttachTexture(uint32_t& Texture) = 0;
+        virtual void AttachTexture(uint32_t Texture) = 0;
 
         static std::unique_ptr<FrameBuffer> Create();
 };

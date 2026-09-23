@@ -59,6 +59,10 @@ struct AmbientComponent {
     float Exposure = 1.0f;
 };
 
+struct PostProcessComponent {
+    std::string ShaderID = "PostProcess";
+};
+
 struct DirectionalLightComponent {
     glm::vec3 Direction{0.0f, -1.0f, 0.0f};
     glm::vec3 LightColor{1.0f};

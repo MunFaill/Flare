@@ -1,22 +1,21 @@
 #[VERTEX]
 #version 460 core
 
+#include "Commom/ScreenTriangle.glsl"
+
 uniform mat4 u_InverseProjection;
 uniform mat4 u_InverseView;
 
 out vec3 vRayDir;
 
 void main() {
-    float x = -1.0 + float((gl_VertexID & 1) << 2);
-    float y = -1.0 + float((gl_VertexID & 2) << 1);
-    vec4 ndcPos = vec4(x, y, 1.0, 1.0);
-    vec4 viewPos = u_InverseProjection * ndcPos;
+    vec4 viewPos = u_InverseProjection * ScreenTriangle();
     viewPos /= viewPos.w;
 
     mat3 invViewRot = mat3(u_InverseView);
     vRayDir = invViewRot * viewPos.xyz;
 
-    gl_Position = ndcPos;
+    gl_Position = ScreenTriangle();
 }
 
 #[FRAGMENT]

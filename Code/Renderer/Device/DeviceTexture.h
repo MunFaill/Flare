@@ -14,6 +14,7 @@ class Texture {
     virtual void Repeat(bool state) = 0;
     virtual void ClampToEdge(bool state) = 0;
     virtual uint32_t GetSlot() = 0;
+    virtual uint32_t GetID() = 0;
 
     static std::unique_ptr<Texture> Create();
 };

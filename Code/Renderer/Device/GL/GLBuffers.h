@@ -39,7 +39,7 @@ class GLFrameBuffer : public FrameBuffer {
 
         void Bind() override;
         void Unbind() override;
-        void AttachTexture(uint32_t& Texture) override;
+        void AttachTexture(uint32_t Texture) override;
     private:
         uint32_t FBO;
 };

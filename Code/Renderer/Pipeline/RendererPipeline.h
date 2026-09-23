@@ -4,6 +4,7 @@
 
 #include "Renderer/Passes/AmbientPass.h"
 #include "Renderer/Passes/GeometryPass.h"
+#include "Renderer/Passes/PostProcessPass.h"
 
 #include <memory>
 #include <flecs.h>
@@ -24,6 +25,7 @@ private:
 
     std::unique_ptr<AmbientPass> m_AmbientPass;
     std::unique_ptr<GeometryPass> m_GeometryPass;
+    std::unique_ptr<PostProcessPass> m_PostProcessPass;
 
     Window* m_Window = nullptr;
 };

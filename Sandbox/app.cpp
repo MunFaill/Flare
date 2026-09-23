@@ -1,11 +1,11 @@
 #include "app.h"
-#include "ECS/Components.h"
 
 static flecs::entity camera;
 static flecs::entity cube;
 static flecs::entity ground;
 static flecs::entity sun;
 static flecs::entity ambient;
+static flecs::entity postProcess; // Chromatic Aberration!
 
 void App::OnSetup() {
     Modules->WindowModule->Title = "Sandbox";
@@ -18,10 +18,11 @@ void App::OnStart() {
     Assets::Textures.Get("DefaultDiffuse")->Mipmaps(true);
 
     camera = World.entity("Camera");
-    cube =  World.entity("Cube");
+    cube = World.entity("Cube");
     ground = World.entity("Gorund");
-    sun =  World.entity("Sun");
-    ambient =  World.entity("Ambient");
+    sun = World.entity("Sun");
+    ambient = World.entity("Ambient");
+    postProcess = World.entity("PostProcess");
 
     camera.set<TransformComponent>({{0.0f, -2.0f, 5.0f}}); // Customize parameters
     camera.add<CameraComponent>(); // Default parameters
@@ -38,6 +39,8 @@ void App::OnStart() {
     sun.add<DirectionalLightComponent>();
 
     ambient.set<AmbientComponent>({Sky, "SkyTexture"});
+
+    postProcess.add<PostProcessComponent>();
 }
 
 void App::OnUpdate(float delta){

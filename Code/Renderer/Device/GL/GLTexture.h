@@ -17,6 +17,7 @@ class GLTexture : public Texture {
         void ClampToEdge(bool state) override;
 
         inline uint32_t GetSlot() override {return LocalSlot;}
+        inline uint32_t GetID() override {return TextureObject;}
     private:
         uint32_t TextureObject = 0;
         uint32_t LocalSlot = 0;
