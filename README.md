@@ -55,4 +55,5 @@ target_link_libraries(YourApp PRIVATE Flare)
 ### See [Sandbox](Sandbox) for use examples.
 - - -
 ### Images from Sandbox application:
-![SC](Docs/FlareScreenshot.png)
+![SC](Docs/PostProcessing.png)
+![PP](Docs/FlareScreenshot.png)
