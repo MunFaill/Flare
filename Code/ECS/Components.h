@@ -41,6 +41,7 @@ struct MeshComponent {
 };
 
 struct ModelComponent {
+    bool Visible = true;
     std::string ModelID = "";
 };
 

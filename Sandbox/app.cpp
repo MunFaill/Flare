@@ -1,5 +1,4 @@
 #include "app.h"
-#include "ECS/Components.h"
 
 static flecs::entity camera;
 static flecs::entity cube;
@@ -29,11 +28,11 @@ void App::OnStart() {
     camera.add<CameraComponent>(); // Default parameters
 
     cube.set<TransformComponent>({{0.0f, 5.0f, 0.0f}});
-    cube.set<ModelComponent>({"Cube"});
+    cube.set<ModelComponent>({true, "Cube"});
     cube.set<CollisionComponent>({true, DynamicBody});
 
     ground.set<TransformComponent>({{0.0f, -5.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {10.0f, 1.0f, 10.0f}});
-    ground.set<ModelComponent>({"Cube"});
+    ground.set<ModelComponent>({true, "Cube"});
     ground.set<CollisionComponent>({true, StaticBody});
 
     sun.set<TransformComponent>({{}, {-5.0f, -5.0f, -5.0f}});

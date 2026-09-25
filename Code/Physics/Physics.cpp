@@ -1,7 +1,5 @@
 #include "Physics/Physics.h"
 #include "ECS/Components.h"
-#include "box3d/math_functions.h"
-#include "box3d/types.h"
 
 #include <box3d/box3d.h>
 #include <print>

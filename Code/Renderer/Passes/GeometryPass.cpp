@@ -25,6 +25,9 @@ void GeometryPass::Execute(const flecs::world& world, const RenderFrame& frame) 
 void GeometryPass::RenderModel(flecs::entity& Entity, const RenderFrame& frame) {
     const ModelComponent& modelComponent = Entity.get<ModelComponent>();
 
+    if (!modelComponent.Visible)
+        return;
+
     Model* model = Assets::Models.Get(modelComponent.ModelID);
 
     if (!model)
@@ -41,7 +44,6 @@ void GeometryPass::RenderModel(flecs::entity& Entity, const RenderFrame& frame) 
 
         if (!shader)
             continue;
-
         RenderMeshPart(Entity, frame, *mesh, *material, *shader);
     }
 }
