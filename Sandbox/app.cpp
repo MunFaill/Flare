@@ -1,4 +1,5 @@
 #include "app.h"
+#include "ECS/Components.h"
 
 static flecs::entity camera;
 static flecs::entity cube;
@@ -45,7 +46,7 @@ void App::OnStart() {
 
 void App::OnUpdate(float DeltaTime, float FramesPerSecond){
     if (Modules->InputModule->KeyJustPressed(KEY_SPACE) && Modules->PhysicsFunctionsModule->IsOnFloor(cube)) {
-        cube.get_mut<CollisionComponent>().LinearVelocity.y += 7.0f;
+        cube.get_mut<CollisionComponent>().LinearVelocity.y += 7.0f; // add an impulse on Y axis
     }
 }
 

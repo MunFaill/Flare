@@ -1,6 +1,7 @@
 #include "Physics/Physics.h"
 #include "ECS/Components.h"
 #include "box3d/math_functions.h"
+#include "box3d/types.h"
 
 #include <box3d/box3d.h>
 #include <print>
@@ -61,19 +62,31 @@ void Physics::Initialize(const flecs::world& World) {
             BoxCollision.rotation = {rotation.x, rotation.y, rotation.z, rotation.w};
 
             // Body
-            b3BodyId BoxCollisionID = b3CreateBody(WorldID, &BoxCollision);
+            b3BodyId BodyID = b3CreateBody(WorldID, &BoxCollision);
 
             switch (Collision.CollisonShape) {
-                case BoxShape:
+                case BoxShape: {
                     b3BoxHull BoxCollisionShape = b3MakeBoxHull(Transform.Scale.x / 2, Transform.Scale.y / 2, Transform.Scale.z / 2);
                     b3ShapeDef BoxCollisionShapeDef = b3DefaultShapeDef();
                     BoxCollisionShapeDef.density = Collision.Density;
                     BoxCollisionShapeDef.baseMaterial.friction = Collision.Friction;
-                    b3CreateHullShape(BoxCollisionID, &BoxCollisionShapeDef, &BoxCollisionShape.base);
+                    b3CreateHullShape(BodyID, &BoxCollisionShapeDef, &BoxCollisionShape.base);
                     break;
+                }
+                case CapsuleShape: {
+                    b3Capsule CapsuleCollisionShape;
+                    CapsuleCollisionShape.center1 = b3Vec3{0.0f, -Transform.Scale.y / 2, 0.0f};
+                    CapsuleCollisionShape.center2 = b3Vec3{0.0f, Transform.Scale.y / 2, 0.0f};
+                    CapsuleCollisionShape.radius = Transform.Scale.x / 2.0f;
+                    b3ShapeDef CapsuleCollisionShapeDef = b3DefaultShapeDef();
+                    CapsuleCollisionShapeDef.density = Collision.Density;
+                    CapsuleCollisionShapeDef.baseMaterial.friction = Collision.Friction;
+                    b3CreateCapsuleShape(BodyID, &CapsuleCollisionShapeDef, &CapsuleCollisionShape);
+                    break;
+                }
             }
 
-            InternalBodies.push_back({e.id(), BoxCollisionID});
+            InternalBodies.push_back({e.id(), BodyID});
         }
     });
 
@@ -141,7 +154,8 @@ bool PhysicsFunctions::IsOnFloor(const flecs::entity Entity) {
         return false;
     }
 
-    const auto& TComp = Entity.get<TransformComponent>();
+    const TransformComponent& TComp = Entity.get<TransformComponent>();
+    const CollisionComponent& CComp = Entity.get<CollisionComponent>();
 
     b3BodyId myBodyId = b3_nullBodyId;
     for (const PhysicsBodyData& data : InternalBodies) {
@@ -154,9 +168,16 @@ bool PhysicsFunctions::IsOnFloor(const flecs::entity Entity) {
     if (B3_IS_NULL(myBodyId)) return false;
 
     float halfHeight = TComp.Scale.y / 2.0f;
-    b3Vec3 origin = { TComp.Position.x, TComp.Position.y - halfHeight + 0.05f, TComp.Position.z };
+    float radius = TComp.Scale.x / 2.0f;
+    float bottom = halfHeight;
+    float rayDistance = 0.15f;
     
-    float rayDistance = 0.15f; 
+    if (CComp.CollisonShape == CapsuleShape) {
+        bottom += radius;
+    }
+
+    b3Vec3 origin = { TComp.Position.x, TComp.Position.y - bottom + 0.05f, TComp.Position.z };
+    
     b3Vec3 translation = { 0.0f, -rayDistance, 0.0f };
 
     b3QueryFilter filter = b3DefaultQueryFilter();

@@ -20,7 +20,8 @@ enum CameraType {
 };
 
 enum ShapeType {
-    BoxShape = 0
+    BoxShape = 0,
+    CapsuleShape = 1
 };
 
 struct TransformComponent {
