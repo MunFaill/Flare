@@ -2,13 +2,14 @@
 #include "Renderer/Device/DeviceBuffers.h"
 #include "Renderer/Device/DeviceTexture.h"
 #include "Renderer/Frames/RendererFrame.h"
+#include "IO/Windowing/Window.h"
+#include "ECS/Components.h"
 
+#include <algorithm>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/trigonometric.hpp>
 
-#include "IO/Windowing/Window.h"
-#include "ECS/Components.h"
 
 static std::unique_ptr<Texture> PostPorcessTextureObj;
 static std::unique_ptr<FrameBuffer> FrameBufferObj;
@@ -133,10 +134,14 @@ RenderFrame RenderPipeline::BuildFrame(flecs::world& world) {
     });
 
     // Point Lights
-    world.each([&](flecs::entity e, TransformComponent& Transform, PointLightComponent& Light) {
-        if (frame.PointLights.size() >= 8)
-            return;
+    struct PointLightCandidate {
+        PointLightData Data;
+        float DistanceSquared;
+    };
 
+    std::vector<PointLightCandidate> Candidates;
+
+    world.each([&](flecs::entity e, TransformComponent& Transform, PointLightComponent& Light) {
         PointLightData data;
 
         if (e.parent()) {
@@ -153,8 +158,26 @@ RenderFrame RenderPipeline::BuildFrame(flecs::world& world) {
         data.Linear = Light.Linear;
         data.Quadratic = Light.Quadratic;
 
-        frame.PointLights.push_back(data);
+        glm::vec3 distTo = data.Position - frame.Camera.Position;
+
+        float distanceSquared = glm::dot(distTo, distTo);
+
+        Candidates.push_back({data, distanceSquared});
     });
+
+    // Sort closest lights first.
+    std::sort(Candidates.begin(), Candidates.end(), [](const PointLightCandidate& a, const PointLightCandidate& b) {return a.DistanceSquared < b.DistanceSquared;});
+
+    // Only the closest lights are sent to the renderer.
+    constexpr size_t MaxPointLights = 8;
+
+    const size_t LightCount = std::min(Candidates.size(), MaxPointLights);
+
+    frame.PointLights.reserve(LightCount);
+
+    for (size_t i = 0; i < LightCount; ++i) {
+        frame.PointLights.push_back(Candidates[i].Data);
+    }
 
     return frame;
 }
