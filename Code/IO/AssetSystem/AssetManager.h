@@ -18,8 +18,7 @@ struct AssetManager {
         if (it != m_Map.end()) {
             return it->second.get();
         }
-        std::println("Error: Asset not found, id: {}", ID);
-        return nullptr;
+        return m_Map.find("MeshError")->second.get();
     }
 
     inline bool Has(const std::string& ID) {

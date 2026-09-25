@@ -6,7 +6,7 @@
 struct Material {
     std::string ShaderID = "Geometry";
     std::string DiffuseTextureID = "DefaultDiffuse";
-    std::string SpecularTextureID = "DefaultSpecular";
+    std::string SpecularTextureID = "";
     glm::vec4 Albedo{1.0f};
     float SpecularPower = 32.0f;
 };
